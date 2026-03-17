@@ -19,3 +19,11 @@ node_modules/
 web3-app/node_modules/
 web3-app/.next/
 .next/
+.env
+.env.local
+.env.*.local
+*.env
+node_modules/
+web3-app/node_modules/
+web3-app/.next/
+.next/
