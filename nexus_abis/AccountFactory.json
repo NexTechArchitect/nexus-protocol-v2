@@ -1,0 +1,542 @@
+{
+    "abi": [
+        {
+            "type": "constructor",
+            "inputs": [
+                {
+                    "name": "_implementation",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "stateMutability": "nonpayable"
+        },
+        {
+            "type": "function",
+            "name": "ACCOUNT_IMPLEMENTATION",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "createAccount",
+            "inputs": [
+                {
+                    "name": "owner",
+                    "type": "address",
+                    "internalType": "address"
+                },
+                {
+                    "name": "salt",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "account",
+                    "type": "address",
+                    "internalType": "contract SmartAccount"
+                }
+            ],
+            "stateMutability": "nonpayable"
+        },
+        {
+            "type": "function",
+            "name": "getAddress",
+            "inputs": [
+                {
+                    "name": "owner",
+                    "type": "address",
+                    "internalType": "address"
+                },
+                {
+                    "name": "salt",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "event",
+            "name": "AccountCreated",
+            "inputs": [
+                {
+                    "name": "account",
+                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address"
+                },
+                {
+                    "name": "owner",
+                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address"
+                }
+            ],
+            "anonymous": false
+        },
+        {
+            "type": "error",
+            "name": "FailedDeployment",
+            "inputs": []
+        },
+        {
+            "type": "error",
+            "name": "InsufficientBalance",
+            "inputs": [
+                {
+                    "name": "balance",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "needed",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ]
+        },
+        {
+            "type": "error",
+            "name": "InvalidAddress",
+            "inputs": []
+        },
+        {
+            "type": "error",
+            "name": "InvalidOwner",
+            "inputs": []
+        }
+    ],
+    "bytecode": {
+        "object": "0x60a060405234801561000f575f5ffd5b506040516104bd3803806104bd83398101604081905261002e91610066565b6001600160a01b0381166100555760405163e6c4247b60e01b815260040160405180910390fd5b6001600160a01b0316608052610093565b5f60208284031215610076575f5ffd5b81516001600160a01b038116811461008c575f5ffd5b9392505050565b6080516103fe6100bf5f395f818160480152818161012401528181610173015261028801526103fe5ff3fe608060405234801561000f575f5ffd5b506004361061003f575f3560e01c8063290ab984146100435780635fbfb9cf146100865780638cb84e1814610099575b5f5ffd5b61006a7f000000000000000000000000000000000000000000000000000000000000000081565b6040516001600160a01b03909116815260200160405180910390f35b61006a610094366004610393565b6100ac565b61006a6100a7366004610393565b610237565b5f6001600160a01b0383166100d4576040516349e27cff60e01b815260040160405180910390fd5b6040516bffffffffffffffffffffffff19606085901b166020820152603481018390525f9060540160408051601f19818403018152919052805160209091012090505f61014a6001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016836102b6565b90506001600160a01b0381163b156101655791506102319050565b5f6101996001600160a01b037f00000000000000000000000000000000000000000000000000000000000000001684610321565b60405163189acdbd60e31b81526001600160a01b0388811660048301529195508592509082169063c4d66de8906024015f604051808303815f87803b1580156101e0575f5ffd5b505af11580156101f2573d5f5f3e3d5ffd5b50506040516001600160a01b03808a169350841691507fac631f3001b55ea1509cf3d7e74898f85392a61a76e8149181ae1259622dabc8905f90a35050505b92915050565b6040516bffffffffffffffffffffffff19606084901b166020820152603481018290525f90819060540160408051601f19818403018152919052805160209091012090506102ae6001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016826102b6565b949350505050565b6040513060388201526f5af43d82803e903d91602b57fd5bf3ff602482015260148101839052733d602d80600a3d3981f3363d3d373d3d3d363d738152605881018290526037600c820120607882015260556043909101205f906001600160a01b03165b9392505050565b5f61031a83838380763d602d80600a3d3981f3363d3d373d3d3d363d730000008460601b60e81c175f526e5af43d82803e903d91602b57fd5bf38460781b17602052826037600984f590506001600160a01b03811661031a5760405163b06ebf3d60e01b815260040160405180910390fd5b5f5f604083850312156103a4575f5ffd5b82356001600160a01b03811681146103ba575f5ffd5b94602093909301359350505056fea2646970667358221220984e86fa3939442b6d1e366c8b78724215bed65074872770f83e2665b4a8182b64736f6c634300081e0033",
+        "sourceMap": "448:2337:53:-:0;;;976:174;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;-1:-1:-1;;;;;1027:29:53;;1023:70;;1065:28;;-1:-1:-1;;;1065:28:53;;;;;;;;;;;1023:70;-1:-1:-1;;;;;1103:40:53;;;448:2337;;14:290:68;84:6;137:2;125:9;116:7;112:23;108:32;105:52;;;153:1;150;143:12;105:52;179:16;;-1:-1:-1;;;;;224:31:68;;214:42;;204:70;;270:1;267;260:12;204:70;293:5;14:290;-1:-1:-1;;;14:290:68:o;:::-;448:2337:53;;;;;;;;;;;;;;;;;;;;;;;;;;;",
+        "linkReferences": {}
+    },
+    "deployedBytecode": {
+        "object": "0x608060405234801561000f575f5ffd5b506004361061003f575f3560e01c8063290ab984146100435780635fbfb9cf146100865780638cb84e1814610099575b5f5ffd5b61006a7f000000000000000000000000000000000000000000000000000000000000000081565b6040516001600160a01b03909116815260200160405180910390f35b61006a610094366004610393565b6100ac565b61006a6100a7366004610393565b610237565b5f6001600160a01b0383166100d4576040516349e27cff60e01b815260040160405180910390fd5b6040516bffffffffffffffffffffffff19606085901b166020820152603481018390525f9060540160408051601f19818403018152919052805160209091012090505f61014a6001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016836102b6565b90506001600160a01b0381163b156101655791506102319050565b5f6101996001600160a01b037f00000000000000000000000000000000000000000000000000000000000000001684610321565b60405163189acdbd60e31b81526001600160a01b0388811660048301529195508592509082169063c4d66de8906024015f604051808303815f87803b1580156101e0575f5ffd5b505af11580156101f2573d5f5f3e3d5ffd5b50506040516001600160a01b03808a169350841691507fac631f3001b55ea1509cf3d7e74898f85392a61a76e8149181ae1259622dabc8905f90a35050505b92915050565b6040516bffffffffffffffffffffffff19606084901b166020820152603481018290525f90819060540160408051601f19818403018152919052805160209091012090506102ae6001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016826102b6565b949350505050565b6040513060388201526f5af43d82803e903d91602b57fd5bf3ff602482015260148101839052733d602d80600a3d3981f3363d3d373d3d3d363d738152605881018290526037600c820120607882015260556043909101205f906001600160a01b03165b9392505050565b5f61031a83838380763d602d80600a3d3981f3363d3d373d3d3d363d730000008460601b60e81c175f526e5af43d82803e903d91602b57fd5bf38460781b17602052826037600984f590506001600160a01b03811661031a5760405163b06ebf3d60e01b815260040160405180910390fd5b5f5f604083850312156103a4575f5ffd5b82356001600160a01b03811681146103ba575f5ffd5b94602093909301359350505056fea2646970667358221220984e86fa3939442b6d1e366c8b78724215bed65074872770f83e2665b4a8182b64736f6c634300081e0033",
+        "sourceMap": "448:2337:53:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;607:47;;;;;;;;-1:-1:-1;;;;;178:32:68;;;160:51;;148:2;133:18;607:47:53;;;;;;;1484:688;;;;;;:::i;:::-;;:::i;2543:240::-;;;;;;:::i;:::-;;:::i;1484:688::-;1554:20;-1:-1:-1;;;;;1590:19:53;;1586:58;;1618:26;;-1:-1:-1;;;1618:26:53;;;;;;;;;;;1586:58;1688:29;;-1:-1:-1;;996:2:68;992:15;;;988:53;1688:29:53;;;976:66:68;1058:12;;;1051:28;;;1655:20:53;;1095:12:68;;1688:29:53;;;-1:-1:-1;;1688:29:53;;;;;;;;;1678:40;;1688:29;1678:40;;;;;-1:-1:-1;1737:24:53;1764:64;-1:-1:-1;;;;;1764:22:53;:50;1678:40;1764:50;:64::i;:::-;1737:91;-1:-1:-1;;;;;;1843:28:53;;;:32;1839:109;;1919:16;-1:-1:-1;1891:46:53;;-1:-1:-1;1891:46:53;1839:109;1958:13;1974:55;-1:-1:-1;;;;;1974:22:53;:41;2016:12;1974:41;:55::i;:::-;2096:25;;-1:-1:-1;;;2096:25:53;;-1:-1:-1;;;;;178:32:68;;;2096:25:53;;;160:51:68;1958:71:53;;-1:-1:-1;1958:71:53;;-1:-1:-1;2096:18:53;;;;;;133::68;;2096:25:53;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;2137:28:53;;-1:-1:-1;;;;;2137:28:53;;;;-1:-1:-1;2137:28:53;;;-1:-1:-1;2137:28:53;;;;;1576:596;;;1484:688;;;;;:::o;2543:240::-;2665:29;;-1:-1:-1;;996:2:68;992:15;;;988:53;2665:29:53;;;976:66:68;1058:12;;;1051:28;;;2613:7:53;;;;1095:12:68;;2665:29:53;;;-1:-1:-1;;2665:29:53;;;;;;;;;2655:40;;2665:29;2655:40;;;;;-1:-1:-1;2712:64:53;-1:-1:-1;;;;;2712:22:53;:50;2655:40;2712:50;:64::i;:::-;2705:71;2543:240;-1:-1:-1;;;;2543:240:53:o;6693:227:25:-;6112:4;6106:11;6907:4;6146;6137:14;;6130:32;6198:34;6191:4;6182:14;;6175:58;-1:-1:-1;6253:14:25;;6246:38;;;6309:42;6297:55;;6381:4;6372:14;;6365:28;;;6455:4;6448;6439:14;;6429:31;6422:4;6413:14;;6406:55;6517:4;6510;6501:14;;;6491:31;6813:17;;-1:-1:-1;;;;;6487:80:25;6849:64;6842:71;6693:227;-1:-1:-1;;;6693:227:25:o;3871:169::-;3955:16;3990:43;4009:14;4025:4;3955:16;;5364:48;5346:14;5342:2;5338:23;5333:3;5329:33;5326:87;5320:4;5313:101;5570:32;5553:14;5548:3;5544:24;5541:62;5535:4;5528:76;5656:4;5650;5644;5637:5;5629:32;5617:44;-1:-1:-1;;;;;;5684:22:25;;5680:85;;5729:25;;-1:-1:-1;;;5729:25:25;;;;;;;;;;;222:354:68;290:6;298;351:2;339:9;330:7;326:23;322:32;319:52;;;367:1;364;357:12;319:52;393:23;;-1:-1:-1;;;;;445:31:68;;435:42;;425:70;;491:1;488;481:12;425:70;514:5;566:2;551:18;;;;538:32;;-1:-1:-1;;;222:354:68:o",
+        "linkReferences": {},
+        "immutableReferences": {
+            "45571": [
+                {
+                    "start": 72,
+                    "length": 32
+                },
+                {
+                    "start": 292,
+                    "length": 32
+                },
+                {
+                    "start": 371,
+                    "length": 32
+                },
+                {
+                    "start": 648,
+                    "length": 32
+                }
+            ]
+        }
+    },
+    "methodIdentifiers": {
+        "ACCOUNT_IMPLEMENTATION()": "290ab984",
+        "createAccount(address,uint256)": "5fbfb9cf",
+        "getAddress(address,uint256)": "8cb84e18"
+    },
+    "rawMetadata": "{\"compiler\":{\"version\":\"0.8.30+commit.73712a01\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_implementation\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"FailedDeployment\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"needed\",\"type\":\"uint256\"}],\"name\":\"InsufficientBalance\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidAddress\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidOwner\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"AccountCreated\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"ACCOUNT_IMPLEMENTATION\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"salt\",\"type\":\"uint256\"}],\"name\":\"createAccount\",\"outputs\":[{\"internalType\":\"contract SmartAccount\",\"name\":\"account\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"salt\",\"type\":\"uint256\"}],\"name\":\"getAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"author\":\"NexTechArchitect\",\"details\":\"Uses CREATE2 for deterministic address prediction and lazy deployment.\",\"errors\":{\"FailedDeployment()\":[{\"details\":\"The deployment failed.\"}],\"InsufficientBalance(uint256,uint256)\":[{\"details\":\"The ETH balance of the account is not enough to perform the operation.\"}]},\"kind\":\"dev\",\"methods\":{\"constructor\":{\"params\":{\"_implementation\":\"The address of the deployed SmartAccount logic.\"}},\"createAccount(address,uint256)\":{\"params\":{\"owner\":\"The address that will own the Smart Account (from social login).\",\"salt\":\"A random number to allow multiple accounts for the same owner.\"},\"returns\":{\"account\":\"The deployed SmartAccount proxy address.\"}},\"getAddress(address,uint256)\":{\"details\":\"Used by the frontend to show the user their deposit address before deployment.\",\"params\":{\"owner\":\"The future owner of the account.\",\"salt\":\"The unique salt used for deployment.\"},\"returns\":{\"_0\":\"The deterministic future address of the Smart Account.\"}}},\"title\":\"AccountFactory\",\"version\":1},\"userdoc\":{\"events\":{\"AccountCreated(address,address)\":{\"notice\":\"Emitted when a new Smart Account clone is deployed\"}},\"kind\":\"user\",\"methods\":{\"ACCOUNT_IMPLEMENTATION()\":{\"notice\":\"The master implementation of the SmartAccount\"},\"constructor\":{\"notice\":\"Initializes the factory with the master implementation address.\"},\"createAccount(address,uint256)\":{\"notice\":\"Deploys a new Smart Account for a user (if not already deployed).\"},\"getAddress(address,uint256)\":{\"notice\":\"Predicts the exact address of a user's Smart Account off-chain.\"}},\"notice\":\"Factory to deploy EIP-1167 Proxy clones of the SmartAccount.\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"src/account-abstraction/AccountFactory.sol\":\"AccountFactory\"},\"evmVersion\":\"prague\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@chainlink/contracts-ccip/=lib/chainlink-brownie-contracts/contracts/src/v0.8/ccip/\",\":@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts/src/v0.8/\",\":@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\",\":account-abstraction/=lib/account-abstraction/contracts/\",\":ccip/=lib/ccip/contracts/\",\":chainlink-brownie-contracts/=lib/chainlink-brownie-contracts/\",\":chainlink/=lib/chainlink/\",\":ds-test/=lib/ccip/contracts/foundry-lib/forge-std/lib/ds-test/src/\",\":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\":forge-std/=lib/forge-std/src/\",\":halmos-cheatcodes/=lib/openzeppelin-contracts/lib/halmos-cheatcodes/src/\",\":openzeppelin-contracts/=lib/openzeppelin-contracts/\"]},\"sources\":{\"lib/openzeppelin-contracts/contracts/interfaces/IERC5267.sol\":{\"keccak256\":\"0xfb223a85dd0b2175cfbbaa325a744e2cd74ecd17c3df2b77b0722f991d2725ee\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://84bf1dea0589ec49c8d15d559cc6d86ee493048a89b2d4adb60fbe705a3d89ae\",\"dweb:/ipfs/Qmd56n556d529wk2pRMhYhm5nhMDhviwereodDikjs68w1\"]},\"lib/openzeppelin-contracts/contracts/proxy/Clones.sol\":{\"keccak256\":\"0x5a1847c0c6b92d60711f04cba9eaff572ae1f657cff1b8ca4ba065bcdbd68d8b\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://403f015277242179edf64150e044b4a18f6ee2cc5edaf6b067a7791545732ed9\",\"dweb:/ipfs/QmYoLCcvqZDofK8ZcvbQcv3Wj5HHku7nF8Y3pXx2efawJb\"]},\"lib/openzeppelin-contracts/contracts/proxy/utils/Initializable.sol\":{\"keccak256\":\"0xdb4d24ee2c087c391d587cd17adfe5b3f9d93b3110b1388c2ab6c7c0ad1dcd05\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ab7b6d5b9e2b88176312967fe0f0e78f3d9a1422fa5e4b64e2440c35869b5d08\",\"dweb:/ipfs/QmXKYWWyzcLg1B2k7Sb1qkEXgLCYfXecR9wYW5obRzWP1Q\"]},\"lib/openzeppelin-contracts/contracts/utils/Bytes.sol\":{\"keccak256\":\"0x8140d608316521b1fd71167c3b708ebb8659da070723fc8807609553b296ee33\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://a7bf7db66869ba1e945a0390b85da2f6afc7e42a4735ca918d0d56ac90c50147\",\"dweb:/ipfs/QmRmNyhpBpgzSdQqLtrQCYE7H7eLnVVxh2Yy4YMrySR8AR\"]},\"lib/openzeppelin-contracts/contracts/utils/Create2.sol\":{\"keccak256\":\"0xe06ddfff69f3ba154d92102d9a85db2780e045303a587360cf12195216e851ca\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ac19cc390a227758c239c06d3a11d0a2c40c8f58eabb034154b661269d4a0851\",\"dweb:/ipfs/QmdSsfYsPX5RyAXSfHRvR5zdY9MffAgZVa3vdxQUypFBa5\"]},\"lib/openzeppelin-contracts/contracts/utils/Errors.sol\":{\"keccak256\":\"0x6afa713bfd42cf0f7656efa91201007ac465e42049d7de1d50753a373648c123\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ba1d02f4847670a1b83dec9f7d37f0b0418d6043447b69f3a29a5f9efc547fcf\",\"dweb:/ipfs/QmQ7iH2keLNUKgq2xSWcRmuBE5eZ3F5whYAkAGzCNNoEWB\"]},\"lib/openzeppelin-contracts/contracts/utils/LowLevelCall.sol\":{\"keccak256\":\"0x5b4802a4352474792df3107e961d1cc593e47b820c14f69d3505cb28f5a6a583\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://a6f86fd01f829499fe0545ff5dda07d4521988e88bfe0bf801fc15650921ed56\",\"dweb:/ipfs/QmUUKu4ZDffHAmfkf3asuQfmLTyfpuy2Amdncc3SqfzKPG\"]},\"lib/openzeppelin-contracts/contracts/utils/Panic.sol\":{\"keccak256\":\"0xf7fe324703a64fc51702311dc51562d5cb1497734f074e4f483bfb6717572d7a\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://c6a5ff4f9fd8649b7ee20800b7fa387d3465bd77cf20c2d1068cd5c98e1ed57a\",\"dweb:/ipfs/QmVSaVJf9FXFhdYEYeCEfjMVHrxDh5qL4CGkxdMWpQCrqG\"]},\"lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol\":{\"keccak256\":\"0xa516cbf1c7d15d3517c2d668601ce016c54395bf5171918a14e2686977465f53\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://1e1d079e8edfb58efd23a311e315a4807b01b5d1cf153f8fa2d0608b9dec3e99\",\"dweb:/ipfs/QmTBExeX2SDTkn5xbk5ssbYSx7VqRp9H4Ux1CY4uQM4b9N\"]},\"lib/openzeppelin-contracts/contracts/utils/ShortStrings.sol\":{\"keccak256\":\"0x0768b3bdb701fe4994b3be932ca8635551dfebe04c645f77500322741bebf57c\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://a2059f9ca8d3c11c49ca49fc9c5fb070f18cc85d12a7688e45322ed0e2a1cb99\",\"dweb:/ipfs/QmS2gwX51RAvSw4tYbjHccY2CKbh2uvDzqHLAFXdsddgia\"]},\"lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol\":{\"keccak256\":\"0xcf74f855663ce2ae00ed8352666b7935f6cddea2932fdf2c3ecd30a9b1cd0e97\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://9f660b1f351b757dfe01438e59888f31f33ded3afcf5cb5b0d9bf9aa6f320a8b\",\"dweb:/ipfs/QmarDJ5hZEgBtCmmrVzEZWjub9769eD686jmzb2XpSU1cM\"]},\"lib/openzeppelin-contracts/contracts/utils/Strings.sol\":{\"keccak256\":\"0x36d1750bf1aa5fee9c52adb2f7857ab652daca722fc05dff533b364f67a1139a\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://2e5e7052539b7849d02f3ce25acc1dce29373c11cfae9f0bc918c54b780c549a\",\"dweb:/ipfs/QmRGE32xNkMTo6i4pHHMxjpiu77yPwnTA25SFngw2NXJys\"]},\"lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol\":{\"keccak256\":\"0x360cf86214a764694dae1522a38200b1737fe90e46dcf56a0f89de143071cc20\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://2e393290a46ca6d1fa1addb40709d26e1d250638ab6acdd103b5af21768ebc7b\",\"dweb:/ipfs/QmPwT3tXwQ9NbGtZ99XRq7sr8LCQP8XaCrzw49JdXGn7us\"]},\"lib/openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol\":{\"keccak256\":\"0x8440117ea216b97a7bad690a67449fd372c840d073c8375822667e14702782b4\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ebb6645995b8290d0b9121825e2533e4e28977b2c6befee76e15e58f0feb61d4\",\"dweb:/ipfs/QmVR72j6kL5R2txuihieDev1FeTi4KWJS1Z6ABbwL3Qtph\"]},\"lib/openzeppelin-contracts/contracts/utils/cryptography/MessageHashUtils.sol\":{\"keccak256\":\"0x6abeed5940e1da7bb329e458db9a1c5c4ea6f86d651b952af99c6bddcd6bbb94\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://5fe75e9a6b759c5d7fd82fb59bd4f58c672b36f0a69b84f4789b7c7895d3e61c\",\"dweb:/ipfs/QmX28wsir8w5sS3acfJMNHcBwoPsDpqCu7WDkPnUWLMNiZ\"]},\"lib/openzeppelin-contracts/contracts/utils/math/Math.sol\":{\"keccak256\":\"0x09e3f1c72d4c5cbe8e2644ab7313f8f7177533ae2f4c24cdcbbeaf520a73734c\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://93208401215d539fa2d81626b207c1f611def7883d0e447b3b5969ebaa7b3c2c\",\"dweb:/ipfs/QmXPxDnQPx8LAweX5ZJqEcwkvs59kP4c64VVDG1Jjq1mef\"]},\"lib/openzeppelin-contracts/contracts/utils/math/SafeCast.sol\":{\"keccak256\":\"0x195533c86d0ef72bcc06456a4f66a9b941f38eb403739b00f21fd7c1abd1ae54\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://b1d578337048cad08c1c03041cca5978eff5428aa130c781b271ad9e5566e1f8\",\"dweb:/ipfs/QmPFKL2r9CBsMwmUqqdcFPfHZB2qcs9g1HDrPxzWSxomvy\"]},\"lib/openzeppelin-contracts/contracts/utils/math/SignedMath.sol\":{\"keccak256\":\"0xb1970fac7b64e6c09611e6691791e848d5e3fe410fa5899e7df2e0afd77a99e3\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://db5fbb3dddd8b7047465b62575d96231ba8a2774d37fb4737fbf23340fabbb03\",\"dweb:/ipfs/QmVUSvooZKEdEdap619tcJjTLcAuH6QBdZqAzWwnAXZAWJ\"]},\"src/account-abstraction/AccountFactory.sol\":{\"keccak256\":\"0x26a9631bac8805b80c4f46cb08233ab1c0d1b335661f57372c4345445e337b51\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://7f908420d6464de5b62831224620c3a81795dc8c4822a5624563f91b7ab050be\",\"dweb:/ipfs/QmXzbyiwJcDUZbgxu9rJMcDBxgPrnuf8vN6C5BYqAbzsHz\"]},\"src/account-abstraction/SmartAccount.sol\":{\"keccak256\":\"0x5d31f1a596f18e059fb95b54894d7668bd84a8a4e6f787683d9f4345b68a4452\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://0ca00346cef459681b73d22bf35002defac18edbdf489c98a730272fd9dc4dc7\",\"dweb:/ipfs/Qma3axUdmZMGAtYidQwoMmw21svK2nXzX2W2UhFxGhxsKj\"]},\"src/errors/PerpsErrors.sol\":{\"keccak256\":\"0x4020220bccb7408c58fb49dde45d119c73c971dac18f0da53695b0c7270da6cb\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://be697bdc018cc6a9cfb88b2d3748a7a82187278721873dceb6d475d79d341b51\",\"dweb:/ipfs/QmavLagBMDXDE7RfZmN7ZTFwU8BWqjjgX3bQX5h15oYy5q\"]}},\"version\":1}",
+    "metadata": {
+        "compiler": {
+            "version": "0.8.30+commit.73712a01"
+        },
+        "language": "Solidity",
+        "output": {
+            "abi": [
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "_implementation",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "nonpayable",
+                    "type": "constructor"
+                },
+                {
+                    "inputs": [],
+                    "type": "error",
+                    "name": "FailedDeployment"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "balance",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "needed",
+                            "type": "uint256"
+                        }
+                    ],
+                    "type": "error",
+                    "name": "InsufficientBalance"
+                },
+                {
+                    "inputs": [],
+                    "type": "error",
+                    "name": "InvalidAddress"
+                },
+                {
+                    "inputs": [],
+                    "type": "error",
+                    "name": "InvalidOwner"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "account",
+                            "type": "address",
+                            "indexed": true
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "owner",
+                            "type": "address",
+                            "indexed": true
+                        }
+                    ],
+                    "type": "event",
+                    "name": "AccountCreated",
+                    "anonymous": false
+                },
+                {
+                    "inputs": [],
+                    "stateMutability": "view",
+                    "type": "function",
+                    "name": "ACCOUNT_IMPLEMENTATION",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ]
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "owner",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "salt",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "nonpayable",
+                    "type": "function",
+                    "name": "createAccount",
+                    "outputs": [
+                        {
+                            "internalType": "contract SmartAccount",
+                            "name": "account",
+                            "type": "address"
+                        }
+                    ]
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "owner",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "salt",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function",
+                    "name": "getAddress",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ]
+                }
+            ],
+            "devdoc": {
+                "kind": "dev",
+                "methods": {
+                    "constructor": {
+                        "params": {
+                            "_implementation": "The address of the deployed SmartAccount logic."
+                        }
+                    },
+                    "createAccount(address,uint256)": {
+                        "params": {
+                            "owner": "The address that will own the Smart Account (from social login).",
+                            "salt": "A random number to allow multiple accounts for the same owner."
+                        },
+                        "returns": {
+                            "account": "The deployed SmartAccount proxy address."
+                        }
+                    },
+                    "getAddress(address,uint256)": {
+                        "details": "Used by the frontend to show the user their deposit address before deployment.",
+                        "params": {
+                            "owner": "The future owner of the account.",
+                            "salt": "The unique salt used for deployment."
+                        },
+                        "returns": {
+                            "_0": "The deterministic future address of the Smart Account."
+                        }
+                    }
+                },
+                "version": 1
+            },
+            "userdoc": {
+                "kind": "user",
+                "methods": {
+                    "ACCOUNT_IMPLEMENTATION()": {
+                        "notice": "The master implementation of the SmartAccount"
+                    },
+                    "constructor": {
+                        "notice": "Initializes the factory with the master implementation address."
+                    },
+                    "createAccount(address,uint256)": {
+                        "notice": "Deploys a new Smart Account for a user (if not already deployed)."
+                    },
+                    "getAddress(address,uint256)": {
+                        "notice": "Predicts the exact address of a user's Smart Account off-chain."
+                    }
+                },
+                "version": 1
+            }
+        },
+        "settings": {
+            "remappings": [
+                "@chainlink/contracts-ccip/=lib/chainlink-brownie-contracts/contracts/src/v0.8/ccip/",
+                "@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts/src/v0.8/",
+                "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+                "account-abstraction/=lib/account-abstraction/contracts/",
+                "ccip/=lib/ccip/contracts/",
+                "chainlink-brownie-contracts/=lib/chainlink-brownie-contracts/",
+                "chainlink/=lib/chainlink/",
+                "ds-test/=lib/ccip/contracts/foundry-lib/forge-std/lib/ds-test/src/",
+                "erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/",
+                "forge-std/=lib/forge-std/src/",
+                "halmos-cheatcodes/=lib/openzeppelin-contracts/lib/halmos-cheatcodes/src/",
+                "openzeppelin-contracts/=lib/openzeppelin-contracts/"
+            ],
+            "optimizer": {
+                "enabled": true,
+                "runs": 200
+            },
+            "metadata": {
+                "bytecodeHash": "ipfs"
+            },
+            "compilationTarget": {
+                "src/account-abstraction/AccountFactory.sol": "AccountFactory"
+            },
+            "evmVersion": "prague",
+            "libraries": {}
+        },
+        "sources": {
+            "lib/openzeppelin-contracts/contracts/interfaces/IERC5267.sol": {
+                "keccak256": "0xfb223a85dd0b2175cfbbaa325a744e2cd74ecd17c3df2b77b0722f991d2725ee",
+                "urls": [
+                    "bzz-raw://84bf1dea0589ec49c8d15d559cc6d86ee493048a89b2d4adb60fbe705a3d89ae",
+                    "dweb:/ipfs/Qmd56n556d529wk2pRMhYhm5nhMDhviwereodDikjs68w1"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/proxy/Clones.sol": {
+                "keccak256": "0x5a1847c0c6b92d60711f04cba9eaff572ae1f657cff1b8ca4ba065bcdbd68d8b",
+                "urls": [
+                    "bzz-raw://403f015277242179edf64150e044b4a18f6ee2cc5edaf6b067a7791545732ed9",
+                    "dweb:/ipfs/QmYoLCcvqZDofK8ZcvbQcv3Wj5HHku7nF8Y3pXx2efawJb"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/proxy/utils/Initializable.sol": {
+                "keccak256": "0xdb4d24ee2c087c391d587cd17adfe5b3f9d93b3110b1388c2ab6c7c0ad1dcd05",
+                "urls": [
+                    "bzz-raw://ab7b6d5b9e2b88176312967fe0f0e78f3d9a1422fa5e4b64e2440c35869b5d08",
+                    "dweb:/ipfs/QmXKYWWyzcLg1B2k7Sb1qkEXgLCYfXecR9wYW5obRzWP1Q"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/utils/Bytes.sol": {
+                "keccak256": "0x8140d608316521b1fd71167c3b708ebb8659da070723fc8807609553b296ee33",
+                "urls": [
+                    "bzz-raw://a7bf7db66869ba1e945a0390b85da2f6afc7e42a4735ca918d0d56ac90c50147",
+                    "dweb:/ipfs/QmRmNyhpBpgzSdQqLtrQCYE7H7eLnVVxh2Yy4YMrySR8AR"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/utils/Create2.sol": {
+                "keccak256": "0xe06ddfff69f3ba154d92102d9a85db2780e045303a587360cf12195216e851ca",
+                "urls": [
+                    "bzz-raw://ac19cc390a227758c239c06d3a11d0a2c40c8f58eabb034154b661269d4a0851",
+                    "dweb:/ipfs/QmdSsfYsPX5RyAXSfHRvR5zdY9MffAgZVa3vdxQUypFBa5"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/utils/Errors.sol": {
+                "keccak256": "0x6afa713bfd42cf0f7656efa91201007ac465e42049d7de1d50753a373648c123",
+                "urls": [
+                    "bzz-raw://ba1d02f4847670a1b83dec9f7d37f0b0418d6043447b69f3a29a5f9efc547fcf",
+                    "dweb:/ipfs/QmQ7iH2keLNUKgq2xSWcRmuBE5eZ3F5whYAkAGzCNNoEWB"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/utils/LowLevelCall.sol": {
+                "keccak256": "0x5b4802a4352474792df3107e961d1cc593e47b820c14f69d3505cb28f5a6a583",
+                "urls": [
+                    "bzz-raw://a6f86fd01f829499fe0545ff5dda07d4521988e88bfe0bf801fc15650921ed56",
+                    "dweb:/ipfs/QmUUKu4ZDffHAmfkf3asuQfmLTyfpuy2Amdncc3SqfzKPG"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/utils/Panic.sol": {
+                "keccak256": "0xf7fe324703a64fc51702311dc51562d5cb1497734f074e4f483bfb6717572d7a",
+                "urls": [
+                    "bzz-raw://c6a5ff4f9fd8649b7ee20800b7fa387d3465bd77cf20c2d1068cd5c98e1ed57a",
+                    "dweb:/ipfs/QmVSaVJf9FXFhdYEYeCEfjMVHrxDh5qL4CGkxdMWpQCrqG"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol": {
+                "keccak256": "0xa516cbf1c7d15d3517c2d668601ce016c54395bf5171918a14e2686977465f53",
+                "urls": [
+                    "bzz-raw://1e1d079e8edfb58efd23a311e315a4807b01b5d1cf153f8fa2d0608b9dec3e99",
+                    "dweb:/ipfs/QmTBExeX2SDTkn5xbk5ssbYSx7VqRp9H4Ux1CY4uQM4b9N"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/utils/ShortStrings.sol": {
+                "keccak256": "0x0768b3bdb701fe4994b3be932ca8635551dfebe04c645f77500322741bebf57c",
+                "urls": [
+                    "bzz-raw://a2059f9ca8d3c11c49ca49fc9c5fb070f18cc85d12a7688e45322ed0e2a1cb99",
+                    "dweb:/ipfs/QmS2gwX51RAvSw4tYbjHccY2CKbh2uvDzqHLAFXdsddgia"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol": {
+                "keccak256": "0xcf74f855663ce2ae00ed8352666b7935f6cddea2932fdf2c3ecd30a9b1cd0e97",
+                "urls": [
+                    "bzz-raw://9f660b1f351b757dfe01438e59888f31f33ded3afcf5cb5b0d9bf9aa6f320a8b",
+                    "dweb:/ipfs/QmarDJ5hZEgBtCmmrVzEZWjub9769eD686jmzb2XpSU1cM"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/utils/Strings.sol": {
+                "keccak256": "0x36d1750bf1aa5fee9c52adb2f7857ab652daca722fc05dff533b364f67a1139a",
+                "urls": [
+                    "bzz-raw://2e5e7052539b7849d02f3ce25acc1dce29373c11cfae9f0bc918c54b780c549a",
+                    "dweb:/ipfs/QmRGE32xNkMTo6i4pHHMxjpiu77yPwnTA25SFngw2NXJys"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol": {
+                "keccak256": "0x360cf86214a764694dae1522a38200b1737fe90e46dcf56a0f89de143071cc20",
+                "urls": [
+                    "bzz-raw://2e393290a46ca6d1fa1addb40709d26e1d250638ab6acdd103b5af21768ebc7b",
+                    "dweb:/ipfs/QmPwT3tXwQ9NbGtZ99XRq7sr8LCQP8XaCrzw49JdXGn7us"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol": {
+                "keccak256": "0x8440117ea216b97a7bad690a67449fd372c840d073c8375822667e14702782b4",
+                "urls": [
+                    "bzz-raw://ebb6645995b8290d0b9121825e2533e4e28977b2c6befee76e15e58f0feb61d4",
+                    "dweb:/ipfs/QmVR72j6kL5R2txuihieDev1FeTi4KWJS1Z6ABbwL3Qtph"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/utils/cryptography/MessageHashUtils.sol": {
+                "keccak256": "0x6abeed5940e1da7bb329e458db9a1c5c4ea6f86d651b952af99c6bddcd6bbb94",
+                "urls": [
+                    "bzz-raw://5fe75e9a6b759c5d7fd82fb59bd4f58c672b36f0a69b84f4789b7c7895d3e61c",
+                    "dweb:/ipfs/QmX28wsir8w5sS3acfJMNHcBwoPsDpqCu7WDkPnUWLMNiZ"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/utils/math/Math.sol": {
+                "keccak256": "0x09e3f1c72d4c5cbe8e2644ab7313f8f7177533ae2f4c24cdcbbeaf520a73734c",
+                "urls": [
+                    "bzz-raw://93208401215d539fa2d81626b207c1f611def7883d0e447b3b5969ebaa7b3c2c",
+                    "dweb:/ipfs/QmXPxDnQPx8LAweX5ZJqEcwkvs59kP4c64VVDG1Jjq1mef"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/utils/math/SafeCast.sol": {
+                "keccak256": "0x195533c86d0ef72bcc06456a4f66a9b941f38eb403739b00f21fd7c1abd1ae54",
+                "urls": [
+                    "bzz-raw://b1d578337048cad08c1c03041cca5978eff5428aa130c781b271ad9e5566e1f8",
+                    "dweb:/ipfs/QmPFKL2r9CBsMwmUqqdcFPfHZB2qcs9g1HDrPxzWSxomvy"
+                ],
+                "license": "MIT"
+            },
+            "lib/openzeppelin-contracts/contracts/utils/math/SignedMath.sol": {
+                "keccak256": "0xb1970fac7b64e6c09611e6691791e848d5e3fe410fa5899e7df2e0afd77a99e3",
+                "urls": [
+                    "bzz-raw://db5fbb3dddd8b7047465b62575d96231ba8a2774d37fb4737fbf23340fabbb03",
+                    "dweb:/ipfs/QmVUSvooZKEdEdap619tcJjTLcAuH6QBdZqAzWwnAXZAWJ"
+                ],
+                "license": "MIT"
+            },
+            "src/account-abstraction/AccountFactory.sol": {
+                "keccak256": "0x26a9631bac8805b80c4f46cb08233ab1c0d1b335661f57372c4345445e337b51",
+                "urls": [
+                    "bzz-raw://7f908420d6464de5b62831224620c3a81795dc8c4822a5624563f91b7ab050be",
+                    "dweb:/ipfs/QmXzbyiwJcDUZbgxu9rJMcDBxgPrnuf8vN6C5BYqAbzsHz"
+                ],
+                "license": "MIT"
+            },
+            "src/account-abstraction/SmartAccount.sol": {
+                "keccak256": "0x5d31f1a596f18e059fb95b54894d7668bd84a8a4e6f787683d9f4345b68a4452",
+                "urls": [
+                    "bzz-raw://0ca00346cef459681b73d22bf35002defac18edbdf489c98a730272fd9dc4dc7",
+                    "dweb:/ipfs/Qma3axUdmZMGAtYidQwoMmw21svK2nXzX2W2UhFxGhxsKj"
+                ],
+                "license": "MIT"
+            },
+            "src/errors/PerpsErrors.sol": {
+                "keccak256": "0x4020220bccb7408c58fb49dde45d119c73c971dac18f0da53695b0c7270da6cb",
+                "urls": [
+                    "bzz-raw://be697bdc018cc6a9cfb88b2d3748a7a82187278721873dceb6d475d79d341b51",
+                    "dweb:/ipfs/QmavLagBMDXDE7RfZmN7ZTFwU8BWqjjgX3bQX5h15oYy5q"
+                ],
+                "license": "MIT"
+            }
+        },
+        "version": 1
+    },
+    "id": 53
+}

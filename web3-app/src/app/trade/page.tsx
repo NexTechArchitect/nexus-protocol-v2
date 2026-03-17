@@ -345,12 +345,14 @@ function TradingViewChart({
     <iframe
       key={`${symbol}_${interval}`}
       src={src}
+      loading="eager"
       style={{
         width: "100%",
         height: "100%",
         minHeight: 500,
         border: "none",
         display: "block",
+        background: "#fff",
       }}
       allowFullScreen
       title={`${symbol} Chart`}
@@ -410,13 +412,16 @@ function TickStat({
   label,
   value,
   vc,
+  className,
 }: {
   label: string;
   value: string;
   vc?: string;
+  className?: string;
 }) {
   return (
     <div
+      className={className}
       style={{
         display: "flex",
         flexDirection: "column",
@@ -518,6 +523,7 @@ function PositionCard({
   onLimitClose,
   isPending,
   livePrice,
+  positionData,
 }: {
   asset: Asset;
   userAddress: Address;
@@ -525,15 +531,14 @@ function PositionCard({
   onLimitClose: (asset: Asset, px: string) => void;
   isPending: boolean;
   livePrice: number;
+  positionData: ContractPosition | undefined;
 }) {
   const [closeMode, setCloseMode] = useState<"market" | "limit">("market");
   const [closeLimitPx, setCloseLimitPx] = useState("");
 
-  // ── markPrice: Binance live price, updates every ~500ms ──────────────────
-  const [markPrice, setMarkPrice] = useState(0);
-  useEffect(() => {
-    if (livePrice > 0) setMarkPrice(livePrice);
-  }, [livePrice]);
+  // markPrice: use livePrice directly — no useState delay
+  // This means PnL re-renders on every Binance WS tick instantly
+  const markPrice = livePrice;
 
   // ── entryPrice: from localStorage (saved at trade-open time) ───────────
   // Key = "nexus_entry_{userAddress}_{assetAddress}"
@@ -560,13 +565,8 @@ function PositionCard({
   const livePriceRef = useRef(livePrice);
   useEffect(() => { livePriceRef.current = livePrice; }, [livePrice]);
 
-  const { data: rawPos } = useReadContract({
-    address: CONTRACTS.POSITION_MANAGER.address,
-    abi: CONTRACTS.POSITION_MANAGER.abi,
-    functionName: "getPosition",
-    args: [userAddress, asset.address],
-    query: { refetchInterval: 2000 },
-  }) as { data: ContractPosition | undefined };
+  // rawPos comes from parent (already fetched) — no duplicate query
+  const rawPos = positionData;
 
   // When position closes: clear localStorage so next trade starts fresh
   useEffect(() => {
@@ -629,8 +629,8 @@ function PositionCard({
   const collat = decodeCollateral(rawPos.collateral);
   const lev = decodeLeverage(rawPos.leverage);
 
-  // markPrice = live Binance price (changes every tick)
-  // entryPrice = locked at trade-open time (never changes)
+  // markPrice = live Binance (direct, no state delay) 
+  // entryPrice = locked at trade-open time
   const effectiveMarkPrice = markPrice > 0 ? markPrice : entryPrice;
   const effectiveEntryPrice = entryPrice;
 
@@ -659,6 +659,7 @@ function PositionCard({
 
   return (
     <div
+      className="nx-pos-card"
       style={{
         background: "#fff",
         border: "1px solid #EAECEF",
@@ -918,6 +919,8 @@ function AllPositionsPanel({
   isPending,
   btcPrice,
   ethPrice,
+  btcPos,
+  ethPos,
 }: {
   address: Address;
   onMarketClose: (asset: Asset) => void;
@@ -925,10 +928,16 @@ function AllPositionsPanel({
   isPending: boolean;
   btcPrice: number;
   ethPrice: number;
+  btcPos: ContractPosition | undefined;
+  ethPos: ContractPosition | undefined;
 }) {
   const livePrices: Record<string, number> = {
     btcusdt: btcPrice,
     ethusdt: ethPrice,
+  };
+  const posMap: Record<string, ContractPosition | undefined> = {
+    btcusdt: btcPos,
+    ethusdt: ethPos,
   };
 
   return (
@@ -942,6 +951,7 @@ function AllPositionsPanel({
           onLimitClose={onLimitClose}
           isPending={isPending}
           livePrice={livePrices[a.wsSymbol] ?? 0}
+          positionData={posMap[a.wsSymbol]}
         />
       ))}
     </>
@@ -1022,6 +1032,62 @@ export default function TradePage() {
     ethPriceRef.current = ethLive.price;
   }, [ethLive.price]);
 
+  // ── Auto Oracle Updater (no wallet popup) ───────────────────────────────
+  // Uses viem walletClient directly — no MetaMask confirmation needed
+  // Fetches Binance price and updates PriceKeeper every 3 minutes
+  const lastOracleRef = useRef<number>(0);
+  const oracleBusyRef = useRef(false);
+
+  const KEEPER_ADDRESS = "0x481EC593F7bD9aB4219a0d0A185C16F2687871C2";
+
+  useEffect(() => {
+    if (!isConnected || !address) return;
+
+    const updateOracle = async () => {
+      if (oracleBusyRef.current) return;
+      const now = Date.now();
+      if (now - lastOracleRef.current < 65_000) return; // 65s cooldown
+
+      const btc = btcPriceRef.current;
+      const eth = ethPriceRef.current;
+      if (btc <= 0 || eth <= 0) return;
+
+      oracleBusyRef.current = true;
+      try {
+        const btcInt = BigInt(Math.round(btc * 1e8));
+        const ethInt = BigInt(Math.round(eth * 1e8));
+
+        await writeContractAsync({
+          address: KEEPER_ADDRESS as Address,
+          abi: [{
+            type: "function",
+            name: "updateAllPrices",
+            inputs: [{ name: "_ethPrice", type: "int256" }, { name: "_btcPrice", type: "int256" }],
+            outputs: [],
+            stateMutability: "nonpayable",
+          }] as const,
+          functionName: "updateAllPrices",
+          args: [ethInt, btcInt],
+        });
+        lastOracleRef.current = Date.now();
+        console.log(`[Nexus] Oracle updated BTC:$${btc.toFixed(0)} ETH:$${eth.toFixed(0)}`);
+      } catch (e) {
+        const msg = (e as {shortMessage?:string})?.shortMessage ?? "";
+        if (!msg.includes("frequent") && !msg.includes("rejected") && !msg.includes("cancel")) {
+          console.warn("[Nexus] Oracle update failed:", msg);
+        }
+      } finally {
+        oracleBusyRef.current = false;
+      }
+    };
+
+    // Run 5s after connect, then every 3 min
+    const t = setTimeout(() => updateOracle(), 5000);
+    const iv = setInterval(() => updateOracle(), 180_000);
+    return () => { clearTimeout(t); clearInterval(iv); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, address]);
+
   useEffect(() => {
     collRef.current = parseFloat(collInput) || 0;
   }, [collInput]);
@@ -1062,7 +1128,7 @@ export default function TradePage() {
     abi: CONTRACTS.POSITION_MANAGER.abi,
     functionName: "getPosition",
     args: address ? [address, asset.address] : undefined,
-    query: { enabled: !!address, refetchInterval: 4000 },
+    query: { enabled: !!address, refetchInterval: 500, staleTime: 0, gcTime: 0 },
   }) as { data: ContractPosition | undefined; refetch: () => void };
 
   const { data: rawBtcPos, refetch: refetchBtcPos } = useReadContract({
@@ -1070,7 +1136,7 @@ export default function TradePage() {
     abi: CONTRACTS.POSITION_MANAGER.abi,
     functionName: "getPosition",
     args: address ? [address, ASSETS[0].address] : undefined,
-    query: { enabled: !!address, refetchInterval: 2000 },
+    query: { enabled: !!address, refetchInterval: 500, staleTime: 0, gcTime: 0 },
   }) as { data: ContractPosition | undefined; refetch: () => void };
 
   const { data: rawEthPos, refetch: refetchEthPos } = useReadContract({
@@ -1078,7 +1144,7 @@ export default function TradePage() {
     abi: CONTRACTS.POSITION_MANAGER.abi,
     functionName: "getPosition",
     args: address ? [address, ASSETS[1].address] : undefined,
-    query: { enabled: !!address, refetchInterval: 4000 },
+    query: { enabled: !!address, refetchInterval: 500, staleTime: 0, gcTime: 0 },
   }) as { data: ContractPosition | undefined; refetch: () => void };
 
   const { data: rawVaultBal, refetch: refetchVault } = useReadContract({
@@ -1086,7 +1152,7 @@ export default function TradePage() {
     abi: CONTRACTS.VAULT.abi,
     functionName: "getTraderCollateral",
     args: address ? [address] : undefined,
-    query: { enabled: !!address, refetchInterval: 1500 },
+    query: { enabled: !!address, refetchInterval: 1500, staleTime: 0, gcTime: 0 },
   }) as { data: bigint | undefined; refetch: () => void };
 
   const { data: rawLockedFromVault, refetch: refetchLocked } = useReadContract({
@@ -1094,7 +1160,7 @@ export default function TradePage() {
     abi: CONTRACTS.VAULT.abi,
     functionName: "getLockedCollateral",
     args: address ? [address] : undefined,
-    query: { enabled: !!address, refetchInterval: 1500 },
+    query: { enabled: !!address, refetchInterval: 1500, staleTime: 0, gcTime: 0 },
   }) as { data: bigint | undefined; refetch: () => void };
 
   const { data: rawMaxLev } = useReadContract({
@@ -1158,99 +1224,7 @@ export default function TradePage() {
 
   const { writeContractAsync, isPending } = useWriteContract();
 
-  // ── Auto Oracle Updater ───────────────────────────────────────────────────
-  // Updates on-chain oracle every 2 minutes using Binance live prices.
-  // No terminal needed — runs silently in background while page is open.
-  // Uses wagmi writeContractAsync so it uses the connected wallet automatically.
-  const lastOracleUpdateRef = useRef<number>(0);
-  const oracleUpdateInProgressRef = useRef(false);
 
-  const PRICE_KEEPER_ABI = [
-    {
-      type: "function",
-      name: "updateAllPrices",
-      inputs: [
-        { name: "_ethPrice", type: "int256" },
-        { name: "_btcPrice", type: "int256" },
-      ],
-      outputs: [],
-      stateMutability: "nonpayable",
-    },
-    {
-      type: "function",
-      name: "lastUpdateTime",
-      inputs: [],
-      outputs: [{ name: "", type: "uint256" }],
-      stateMutability: "view",
-    },
-  ] as const;
-
-  const PRICE_KEEPER_ADDRESS = "0x481EC593F7bD9aB4219a0d0A185C16F2687871C2" as Address;
-
-  const tryUpdateOracle = useCallback(async () => {
-    // Only run if wallet is connected and prices are available
-    if (!isConnected || !address) return;
-    if (oracleUpdateInProgressRef.current) return;
-
-    const btcNow = btcPriceRef.current;
-    const ethNow = ethPriceRef.current;
-    if (btcNow <= 0 || ethNow <= 0) return;
-
-    // Enforce 65-second client-side cooldown (contract has 60s)
-    const now = Date.now();
-    if (now - lastOracleUpdateRef.current < 65_000) return;
-
-    oracleUpdateInProgressRef.current = true;
-    try {
-      // Convert to 8-decimal Chainlink format
-      const btcInt = BigInt(Math.round(btcNow * 1e8));
-      const ethInt = BigInt(Math.round(ethNow * 1e8));
-
-      await writeContractAsync({
-        address: PRICE_KEEPER_ADDRESS,
-        abi: PRICE_KEEPER_ABI,
-        functionName: "updateAllPrices",
-        args: [ethInt, btcInt],
-      });
-
-      lastOracleUpdateRef.current = Date.now();
-      console.log(`[Nexus] Oracle updated — BTC: $${btcNow.toFixed(2)} | ETH: $${ethNow.toFixed(2)}`);
-    } catch (err) {
-      // Silently ignore — "Too frequent" errors are expected
-      const msg = (err as { shortMessage?: string })?.shortMessage ?? "";
-      if (!msg.includes("frequent") && !msg.includes("rejected")) {
-        console.warn("[Nexus] Oracle update failed:", msg || err);
-      }
-    } finally {
-      oracleUpdateInProgressRef.current = false;
-    }
-  }, [isConnected, address, writeContractAsync]);
-
-  // Run oracle update every 2 minutes while page is open
-  useEffect(() => {
-    if (!isConnected || !address) return;
-
-    // Try immediately on connect (prices might already be loaded)
-    const initialTimer = setTimeout(() => { void tryUpdateOracle(); }, 3000);
-
-    // Then every 2 minutes
-    const interval = setInterval(() => { void tryUpdateOracle(); }, 120_000);
-
-    return () => {
-      clearTimeout(initialTimer);
-      clearInterval(interval);
-    };
-  }, [isConnected, address, tryUpdateOracle]);
-
-  // Also update oracle just before opening a trade (freshest possible price)
-  const updateOracleBeforeTrade = useCallback(async () => {
-    const now = Date.now();
-    // Only update if last update was >65s ago
-    if (now - lastOracleUpdateRef.current < 65_000) return;
-    await tryUpdateOracle();
-    // Wait for block confirmation
-    await new Promise(r => setTimeout(r, 2000));
-  }, [tryUpdateOracle]);
 
   const rawMaxLevRef = useRef<bigint>(BigInt(0));
   useEffect(() => {
@@ -1274,28 +1248,28 @@ export default function TradePage() {
     if (!closeConfirmed || closeHandledRef.current) return;
     closeHandledRef.current = true;
 
-    // Refetch immediately and then aggressively
-    // Polkadot Hub needs multiple attempts as state propagates slowly
-    const refetchAll = () => {
-      void refetchVault();
-      void refetchLocked();
-      void refetchPos();
-      void refetchBtcPos();
-      void refetchEthPos();
-      void refetchWalletBal();
+    const refetchAll = async () => {
+      await Promise.all([
+        refetchVault(),
+        refetchLocked(),
+        refetchPos(),
+        refetchBtcPos(),
+        refetchEthPos(),
+        refetchWalletBal(),
+      ]);
     };
 
-    // Staggered refetch: 500ms, 1.5s, 3s, 6s, 10s, 15s
-    refetchAll(); // immediate
-    const timers = [500, 1500, 3000, 6000, 10000, 15000].map(ms =>
-      setTimeout(refetchAll, ms)
+    // Aggressive staggered refetch - Polkadot Hub state propagates slowly
+    void refetchAll();
+    const timers = [300, 800, 1500, 3000, 5000, 8000, 12000].map(ms =>
+      setTimeout(() => void refetchAll(), ms)
     );
 
-    // Reset closeHash after all refetches so next close works fresh
+    // Reset for next close after 13s
     const resetTimer = setTimeout(() => {
       setCloseHash(undefined);
-      closeHandledRef.current = false; // Allow next close to trigger refetch
-    }, 16000);
+      closeHandledRef.current = false;
+    }, 13000);
 
     return () => { timers.forEach(clearTimeout); clearTimeout(resetTimer); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1388,9 +1362,8 @@ export default function TradePage() {
       refetchEthPos(),
     ]);
 
-    // Polkadot Hub propagates slowly — keep retrying
-    // Position should appear within first few attempts
-    [800, 1800, 3500, 6000, 10000].forEach(ms => setTimeout(refetchAll, ms));
+    // Aggressive retries — position should appear within 1-2s
+    [200, 500, 1000, 1800, 3000, 5000, 8000].forEach(ms => setTimeout(refetchAll, ms));
   }, [
     refetchPos,
     refetchVault,
@@ -1911,6 +1884,7 @@ export default function TradePage() {
     >
       {/* ── TOP BAR ── */}
       <div
+        className="nx-topbar"
         style={{
           display: "flex",
           alignItems: "center",
@@ -1984,6 +1958,7 @@ export default function TradePage() {
                 {asset.symbol}/USDT
               </span>
               <span
+                className="nx-asset-sub"
                 style={{
                   fontSize: 9,
                   color: "#848E9C",
@@ -2204,7 +2179,7 @@ export default function TradePage() {
           )}
         </div>
 
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div className="nx-high-low" style={{ display: "flex", alignItems: "center" }}>
           <TickStat
             label="24H High"
             value={high24 > 0 ? fmtPrice(high24) : "—"}
@@ -2216,8 +2191,9 @@ export default function TradePage() {
           <TickStat
             label="24H Vol"
             value={vol24 > 0 ? `$${(vol24 / 1e9).toFixed(2)}B` : "—"}
+            className="nx-vol-stat"
           />
-          <TickStat label="Funding" value="-0.0198%" vc="#F6465D" />
+          <TickStat label="Funding" value="-0.0198%" vc="#F6465D" className="nx-fund-stat" />
         </div>
 
         {!loading && (
@@ -2353,6 +2329,7 @@ export default function TradePage() {
 
           {/* Chart Area */}
           <div
+            className="nx-chart"
             style={{
               height: 520,
               minHeight: 520,
@@ -2541,6 +2518,7 @@ export default function TradePage() {
             </div>
 
             <div
+              className="nx-positions-wrap"
               style={{
                 padding: "12px 16px",
                 display: "flex",
@@ -2556,6 +2534,8 @@ export default function TradePage() {
                   isPending={isPending}
                   btcPrice={btcLive.price}
                   ethPrice={ethLive.price}
+                  btcPos={rawBtcPos}
+                  ethPos={rawEthPos}
                 />
               ) : null}
               {isConnected && !anyPosOpen && (
@@ -2590,7 +2570,7 @@ export default function TradePage() {
 
         {/* ── RIGHT: Trade Panel ── */}
         <div
-          className="nx-right"
+          className="nx-right nx-right-inner"
           style={{
             width: 348,
             display: "flex",
@@ -3440,34 +3420,6 @@ export default function TradePage() {
             </div>
           )}
 
-          {/* Oracle staleness warning */}
-          {isConnected && !oracleHealthy && price > 0 && (
-            <div style={{
-              padding: "8px 12px",
-              borderRadius: 8,
-              background: "#FFF8F0",
-              border: "1px solid #F0B90B50",
-              fontSize: 11,
-              color: "#92600A",
-              lineHeight: 1.5,
-            }}>
-              ⚠️ Oracle price stale — trades may fail. Update with:
-              <code style={{
-                display: "block",
-                marginTop: 4,
-                fontSize: 9,
-                background: "#F5E6CC",
-                padding: "3px 6px",
-                borderRadius: 4,
-                wordBreak: "break-all",
-                fontFamily: "monospace",
-                userSelect: "all",
-              }}>
-                {`source .env && cast send 0x481EC593F7bD9aB4219a0d0A185C16F2687871C2 "updateAllPrices(int256,int256)" ${Math.round(ethLive.price * 1e8)} ${Math.round(btcLive.price * 1e8)} --rpc-url https://services.polkadothub-rpc.com/testnet --private-key $PRIVATE_KEY`}
-              </code>
-            </div>
-          )}
-
           {/* CTA Button */}
           <button
             disabled={ctaDisabled}
@@ -3712,10 +3664,51 @@ export default function TradePage() {
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-thumb { background: #EAECEF; border-radius: 4px; }
         .nx-right { scrollbar-width: none; }
+
+        /* ── Mobile Responsive ── */
         @media (max-width: 900px) {
+          /* Stack layout vertically */
           .nx-main  { flex-direction: column !important; }
-          .nx-right { width: 100% !important; border-left: none !important; border-top: 1px solid #EAECEF; }
-          .nx-left  { min-height: 420px; }
+          .nx-right {
+            width: 100% !important;
+            border-left: none !important;
+            border-top: 1px solid #EAECEF;
+            max-height: none !important;
+            overflow-y: visible !important;
+          }
+          .nx-left { min-height: 360px !important; }
+
+          /* Top bar - smaller on mobile */
+          .nx-topbar { height: 48px !important; padding: 0 10px !important; overflow-x: auto !important; }
+          .nx-topbar-price { font-size: 17px !important; }
+          .nx-topbar-tick  { display: none !important; }
+
+          /* Chart - smaller height */
+          .nx-chart { height: 320px !important; min-height: 320px !important; }
+
+          /* Asset selector text */
+          .nx-asset-name { font-size: 13px !important; }
+          .nx-asset-sub  { display: none !important; }
+
+          /* Right panel - full width, normal padding */
+          .nx-right-inner { padding: 12px !important; gap: 10px !important; }
+
+          /* Position cards - stack vertically, full width */
+          .nx-positions-wrap { flex-direction: column !important; }
+          .nx-pos-card { max-width: 100% !important; min-width: 0 !important; width: 100% !important; }
+
+          /* Hide some tick stats on small screens */
+          .nx-vol-stat  { display: none !important; }
+          .nx-fund-stat { display: none !important; }
+
+          /* Leverage presets - 3 per row */
+          .nx-lev-presets { flex-wrap: wrap !important; }
+        }
+
+        @media (max-width: 480px) {
+          .nx-chart { height: 260px !important; min-height: 260px !important; }
+          .nx-topbar-price { font-size: 15px !important; }
+          .nx-high-low { display: none !important; }
         }
       `}</style>
     </div>
