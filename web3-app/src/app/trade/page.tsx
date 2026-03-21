@@ -1337,8 +1337,12 @@ export default function TradePage() {
       refetchEthPos(),
     ]);
 
-    // Aggressive retries — position should appear within 1-2s
-    [200, 500, 1000, 1800, 3000, 5000, 8000].forEach(ms => setTimeout(refetchAll, ms));
+    // Aggressive retries — Polkadot Hub state propagates slowly
+    // Keep retrying for 15s to catch the position
+    const delays = [200, 500, 900, 1500, 2500, 4000, 6000, 9000, 13000];
+    const timers = delays.map(ms => setTimeout(refetchAll, ms));
+    // Cleanup after 15s
+    setTimeout(() => timers.forEach(clearTimeout), 15000);
   }, [
     refetchPos,
     refetchVault,
