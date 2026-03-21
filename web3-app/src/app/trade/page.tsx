@@ -301,11 +301,15 @@ function useBinanceLive(wsSymbol: string): BinanceData {
           setLoading(false);
         }
         if (d.e === "aggTrade") {
+          // Update price on EVERY trade — much faster than miniTicker (1s)
+          // aggTrade fires on every matched order, giving sub-second price updates
+          const tradePrice = parseFloat(d.p);
+          if (tradePrice > 0) setPrice(tradePrice);
           setTrades((prev) =>
             [
               {
                 id: tid.current++,
-                price: parseFloat(d.p),
+                price: tradePrice,
                 qty: parseFloat(d.q),
                 time: new Date(parseInt(d.T)).toLocaleTimeString("en-US", {
                   hour12: false,
