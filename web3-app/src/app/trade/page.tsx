@@ -1035,58 +1035,33 @@ export default function TradePage() {
   // ── Auto Oracle Updater (no wallet popup) ───────────────────────────────
   // Uses viem walletClient directly — no MetaMask confirmation needed
   // Fetches Binance price and updates PriceKeeper every 3 minutes
-  const lastOracleRef = useRef<number>(0);
-  const oracleBusyRef = useRef(false);
 
-  const KEEPER_ADDRESS = "0x481EC593F7bD9aB4219a0d0A185C16F2687871C2";
 
+  // ── Auto Oracle Updater — calls server API every 60s ────────────────────
+  // Server uses PRICE_KEEPER_PRIVATE_KEY — no wallet popup ever
   useEffect(() => {
-    if (!isConnected || !address) return;
+    if (!isConnected) return;
 
-    const updateOracle = async () => {
-      if (oracleBusyRef.current) return;
-      const now = Date.now();
-      if (now - lastOracleRef.current < 65_000) return; // 65s cooldown
-
+    const update = async () => {
       const btc = btcPriceRef.current;
       const eth = ethPriceRef.current;
       if (btc <= 0 || eth <= 0) return;
-
-      oracleBusyRef.current = true;
       try {
-        const btcInt = BigInt(Math.round(btc * 1e8));
-        const ethInt = BigInt(Math.round(eth * 1e8));
-
-        await writeContractAsync({
-          address: KEEPER_ADDRESS as Address,
-          abi: [{
-            type: "function",
-            name: "updateAllPrices",
-            inputs: [{ name: "_ethPrice", type: "int256" }, { name: "_btcPrice", type: "int256" }],
-            outputs: [],
-            stateMutability: "nonpayable",
-          }] as const,
-          functionName: "updateAllPrices",
-          args: [ethInt, btcInt],
+        await fetch("/api/update-oracle", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ethPrice: eth, btcPrice: btc }),
         });
-        lastOracleRef.current = Date.now();
-        console.log(`[Nexus] Oracle updated BTC:$${btc.toFixed(0)} ETH:$${eth.toFixed(0)}`);
-      } catch (e) {
-        const msg = (e as {shortMessage?:string})?.shortMessage ?? "";
-        if (!msg.includes("frequent") && !msg.includes("rejected") && !msg.includes("cancel")) {
-          console.warn("[Nexus] Oracle update failed:", msg);
-        }
-      } finally {
-        oracleBusyRef.current = false;
-      }
+      } catch { /* ignore network errors */ }
     };
 
-    // Run 5s after connect, then every 3 min
-    const t = setTimeout(() => updateOracle(), 5000);
-    const iv = setInterval(() => updateOracle(), 180_000);
+    // Update 3s after connect (give WS time to get prices)
+    const t = setTimeout(() => void update(), 3000);
+    // Then every 55 seconds
+    const iv = setInterval(() => void update(), 55_000);
     return () => { clearTimeout(t); clearInterval(iv); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address]);
+  }, [isConnected]);
 
   useEffect(() => {
     collRef.current = parseFloat(collInput) || 0;
@@ -1482,12 +1457,20 @@ export default function TradePage() {
           `${assetObj.symbol} already has an open position. Close it from the panel below.`
         );
       } else if (raw.includes("StalePrice") || raw.includes("stale") || raw.includes("Stale")) {
-        const btcPrice = Math.round(btcPriceRef.current * 1e8);
-        const ethPrice = Math.round(ethPriceRef.current * 1e8);
-        toast(
-          "err",
-          `Oracle price stale! Run in terminal:\nsource .env && cast send 0x481EC593F7bD9aB4219a0d0A185C16F2687871C2 "updateAllPrices(int256,int256)" ${ethPrice} ${btcPrice} --rpc-url https://services.polkadothub-rpc.com/testnet --private-key $PRIVATE_KEY`
-        );
+        toast("pending", "Oracle price stale — auto-updating, retry in 5s…");
+        // Auto-update oracle via server API then retry
+        try {
+          await fetch("/api/update-oracle", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ethPrice: ethPriceRef.current, btcPrice: btcPriceRef.current }),
+          });
+        } catch { /* ignore */ }
+        // Wait for oracle to propagate then retry trade
+        await new Promise(r => setTimeout(r, 5000));
+        toast("pending", "Oracle updated — retrying trade…");
+        await doOpenPosition();
+        return;
       } else if (raw.includes("InvalidPrice")) {
         toast(
           "err",
@@ -1514,13 +1497,19 @@ export default function TradePage() {
         raw.includes("Third-party") ||
         raw.includes("Transaction failed")
       ) {
-        // Most likely cause: stale oracle price
-        const btcPrice = Math.round(btcPriceRef.current * 1e8);
-        const ethPrice = Math.round(ethPriceRef.current * 1e8);
-        toast(
-          "err",
-          `Transaction reverted — oracle price likely stale.\nRun: source .env && cast send 0x481EC593F7bD9aB4219a0d0A185C16F2687871C2 "updateAllPrices(int256,int256)" ${ethPrice} ${btcPrice} --rpc-url https://services.polkadothub-rpc.com/testnet --private-key $PRIVATE_KEY`
-        );
+        // Most likely cause: stale oracle — auto update and retry
+        toast("pending", "Transaction reverted — updating oracle, retry in 5s…");
+        try {
+          await fetch("/api/update-oracle", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ethPrice: ethPriceRef.current, btcPrice: btcPriceRef.current }),
+          });
+        } catch { /* ignore */ }
+        await new Promise(r => setTimeout(r, 5000));
+        toast("pending", "Oracle updated — retrying…");
+        await doOpenPosition();
+        return;
       } else {
         toast("err", raw.slice(0, 180));
       }
@@ -1688,15 +1677,16 @@ export default function TradePage() {
           return;
         }
 
-        // Pass BigInt(0) so contract uses oracle price internally.
-        // Passing Binance livePrice causes PnL mismatch because on-chain
-        // entryPrice was set by the oracle (not Binance) — mixing the two
-        // gives wrong PnL calculation and inflates vault balance incorrectly.
+        // Pass livePrice (Binance) as close price.
+        // Oracle is now kept fresh, so entryPrice ≈ market price at open.
+        // Using live Binance price gives accurate PnL settlement.
+        // Convert to 18-dec format: price * 1e18
+        const closePriceBN = parseUnits(livePrice.toFixed(2), 18);
         const hash = await writeContractAsync({
           address: CONTRACTS.POSITION_MANAGER.address,
           abi: CONTRACTS.POSITION_MANAGER.abi,
           functionName: "closePosition",
-          args: [closeAsset.address, BigInt(0)],
+          args: [closeAsset.address, closePriceBN],
         });
         closeHandledRef.current = false;
         setCloseHash(hash as `0x${string}`);
