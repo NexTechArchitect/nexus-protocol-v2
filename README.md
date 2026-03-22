@@ -3,50 +3,58 @@
 <img src="https://img.shields.io/badge/⚡-NEXUS_PERPS-F0B90B?style=for-the-badge&labelColor=0f172a&color=F0B90B" height="36"/>
 
 # On-Chain Perpetuals Infrastructure
-### Ethereum Sepolia · Non-Custodial · Zero Gas
+### Polkadot Hub Testnet · Non-Custodial · 50× Leverage
+
 <br>
 
 [![License](https://img.shields.io/badge/License-MIT-22c55e?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Foundry](https://img.shields.io/badge/Built_With-Foundry-F0B90B?style=flat-square)](https://book.getfoundry.sh/)
-[![Network](https://img.shields.io/badge/Network-Ethereum_Sepolia-627EEA?style=flat-square)](https://sepolia.etherscan.io/)
-[![Oracle](https://img.shields.io/badge/Oracle-Chainlink_Live-375BD2?style=flat-square)](https://chain.link/)
-[![AA](https://img.shields.io/badge/Accounts-ERC--4337_Gasless-F0B90B?style=flat-square)](https://eips.ethereum.org/EIPS/eip-4337)
-[![CCIP](https://img.shields.io/badge/Cross--Chain-Chainlink_CCIP-375BD2?style=flat-square)](https://chain.link/cross-chain)
+[![Network](https://img.shields.io/badge/Network-Polkadot_Hub_Testnet-E6007A?style=flat-square)](https://polkadot.network/)
+[![Chain](https://img.shields.io/badge/Chain_ID-420420417-E6007A?style=flat-square)]()
+[![CCIP](https://img.shields.io/badge/Cross--Chain-CCIP_Ready-375BD2?style=flat-square)](https://chain.link/cross-chain)
 
 <br>
 
-> **A fully on-chain perpetuals exchange with zero off-chain dependencies.**  
-> Chainlink price oracles · ERC-4337 gasless smart accounts · CCIP cross-chain margin · 50× leverage.
+> **A fully on-chain perpetuals exchange deployed on Polkadot Hub Testnet.**  
+> Mock Chainlink price feeds · Binance live prices · CCIP cross-chain margin · 50× leverage.
 
 <br>
 
-<a href="https://nexus-protocol-os.vercel.app/">
+<a href="https://nexus-protocol-v2.vercel.app/">
   <img src="https://img.shields.io/badge/%E2%9A%A1_LAUNCH_APP-NEXUS_PERPS-F0B90B?style=for-the-badge&labelColor=0f172a" height="44"/>
 </a>
 
 <br><br>
 
-<a href="https://github.com/NexTechArchitect/Nexus-Protocol">💻 Source Code</a> &nbsp;·&nbsp;
-<a href="https://nexus-protocol-os.vercel.app/docs">📜 Docs</a> &nbsp;·&nbsp;
-<a href="https://sepolia.etherscan.io/address/0x6952144C5dfb64DF54a64b61B3321Fd2C24cB42A">🔗 PositionManager</a> &nbsp;·&nbsp;
-<a href="https://faucet.circle.com/">🚰 Get Testnet USDC</a>
+<a href="https://nexus-protocol-v2.vercel.app/">🚀 Live App</a> &nbsp;·&nbsp;
+<a href="https://github.com/NexTechArchitect/nexus-polka-perps">💻 Source Code</a> &nbsp;·&nbsp;
+<a href="https://nexus-protocol-v2.vercel.app/docs">📜 Docs</a> &nbsp;·&nbsp;
+<a href="https://faucet.polkadot.io/">🚰 Get Testnet PAS</a>
 
+</div>
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/0aa71e44-42ef-43c6-8a9a-1ffb3fe06fd4" 
+    width="500" 
+    autoplay 
+    loop 
+    muted 
+    playsinline>
+  </video>
 </div>
 
 ---
 
 ## 🎯 What Makes Nexus Different
 
-Most DeFi perp protocols rely on off-chain matching engines, centralized price feeds, or custodial bridges. Nexus Perps eliminates every one of these dependencies — every price fetch, every liquidation, every settlement runs entirely on-chain with no external coordination layer.
-
 | Problem With Existing Protocols | Nexus Solution |
 |:---|:---|
-| Oracle manipulation via thin markets | Chainlink aggregators with per-asset heartbeat staleness guards |
-| Gas costs kill small traders | ERC-4337 smart accounts + NexusPaymaster sponsors 100% of gas |
-| Liquidity fragmented across chains | Chainlink CCIP cross-chain margin relay with nonce replay protection |
+| Oracle manipulation via thin markets | MockAggregatorV3 with per-asset heartbeat staleness guards |
+| Liquidity fragmented across chains | CCIP cross-chain margin relay with nonce replay protection |
 | Custodial bridges introduce counterparty risk | All collateral lives in `PerpsVault.sol` — non-custodial, on-chain |
 | LP inflation attacks on first deposit | `MINIMUM_LIQUIDITY = 1000` shares permanently burned on genesis deposit |
 | Dust sweep / precision drain | `scaledAmount % DECIMALS_SCALAR != 0` enforced on every withdrawal |
+| Stale oracle prices | Binance WebSocket drives live PnL; entry price saved locally at trade execution |
 
 ---
 
@@ -66,16 +74,10 @@ Most DeFi perp protocols rely on off-chain matching engines, centralized price f
 
 Five isolated protocol layers. A failure in cross-chain routing cannot affect vault solvency. The oracle layer is fully stateless with zero write access to core contracts.
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────┐
 │                        USER / DAPP                               │
-│         RainbowKit · Wagmi v2 · Viem · Next.js 14 App Router     │
-└───────────────────────────┬──────────────────────────────────────┘
-                            │
-┌───────────────────────────▼──────────────────────────────────────┐
-│                 ACCOUNT ABSTRACTION  (ERC-4337)                  │
-│   SmartAccount.sol ── AccountFactory.sol ── NexusPaymaster.sol   │
-│   Gasless UserOps · EIP-712 signing · CREATE2 deterministic AA   │
+│         RainbowKit · Wagmi v2 · Viem · Next.js 15 App Router     │
 └───────────────────────────┬──────────────────────────────────────┘
                             │
 ┌───────────────────────────▼──────────────────────────────────────┐
@@ -84,19 +86,19 @@ Five isolated protocol layers. A failure in cross-chain routing cannot affect va
 │   Market & limit orders · Isolated/Cross margin · Batch keepers  │
 └────────────┬─────────────────────────────────┬───────────────────┘
              │                                 │
-┌────────────▼────────────┐       ┌────────────▼────────────────── ┐
-│      VAULT LAYER        │       │        ORACLE LAYER             │
-│   PerpsVault.sol        │       │   PriceOracle.sol               │
-│   18-dec precision      │       │   Chainlink BTC/USD + ETH/USD   │
-│   LP share system       │       │   Heartbeat staleness guard     │
-│   settleTrade / PnL     │       │   Normalized to 1e18            │
-└─────────────────────────┘       └─────────────────────────────────┘
+┌────────────▼────────────┐       ┌────────────▼───────────────────┐
+│      VAULT LAYER        │       │        ORACLE LAYER            │
+│   PerpsVault.sol        │       │   PriceOracle.sol              │
+│   18-dec precision      │       │   MockAggregatorV3 (BTC+ETH)   │
+│   LP share system       │       │   Heartbeat staleness guard    │
+│   settleTrade / PnL     │       │   Binance WS live prices       │
+└─────────────────────────┘       └────────────────────────────────┘
              │
 ┌────────────▼────────────────────────────────────────────────────┐
-│                  CROSS-CHAIN LAYER  (CCIP)                       │
-│   CrossChainRouter.sol ── encodes & sends trade requests         │
-│   MessageReceiver.sol  ── decodes, deduplicates nonce, executes  │
-│   Source chain + sender whitelist · try/catch pipeline safety    │
+│                  CROSS-CHAIN LAYER  (CCIP)                      │
+│   CrossChainRouter.sol ── encodes & sends trade requests        │
+│   MessageReceiver.sol  ── decodes, deduplicates nonce, executes │
+│   Source chain + sender whitelist · try/catch pipeline safety   │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -104,54 +106,47 @@ Five isolated protocol layers. A failure in cross-chain routing cannot affect va
 
 **1. No off-chain trust** — Price discovery, execution, liquidation, settlement — all fully on-chain.
 
-**2. 18-decimal precision throughout** — `DECIMALS_SCALAR = 10^(18 - tokenDecimals)` normalizes USDC (6 dec) to 1e18 internally, eliminating dust-sweep and rounding bugs.
+**2. 18-decimal precision throughout** — `DECIMALS_SCALAR = 10^(18 - tokenDecimals)` normalizes USDC (6 dec) to 1e18 internally.
 
-**3. Vault solvency is an invariant** — 128 runs × 50 calls = 6,400 randomized state mutations, zero reverts against `totalLiquidity + totalLockedCollateral + totalTraderFreeCollateral == ASSET.balanceOf(vault)`.
+**3. Vault solvency is an invariant** — 128 runs × 50 calls = 6,400 randomized state mutations, zero reverts.
 
-**4. Isolated margin by default** — Cross-margin mode uses `_calculateGlobalPnL` iterating all active positions for holistic equity checks before liquidation.
+**4. Isolated margin by default** — Cross-margin mode uses `_calculateGlobalPnL` iterating all active positions.
 
 ---
 
 ## ✅ Deployed Contracts
 
-All contracts deployed on **Ethereum Sepolia** and verified on Etherscan.
+All contracts deployed on **Polkadot Hub Testnet** (Chain ID: `420420417`).
+
+**Explorer:** blockscout-passet-hub.parity-testnet.parity.io  
+**RPC:** services.polkadothub-rpc.com/testnet
 
 ### Core Trading Engine
 
-| Contract | Address | Etherscan |
-|:---|:---|:---|
-| **PositionManager** | `0x6952144C5dfb64DF54a64b61B3321Fd2C24cB42A` | [↗](https://sepolia.etherscan.io/address/0x6952144C5dfb64DF54a64b61B3321Fd2C24cB42A) |
-| **PerpsVault** | `0x891FBf3C860333FB05f3f80526C3a1919de2d83c` | [↗](https://sepolia.etherscan.io/address/0x891FBf3C860333FB05f3f80526C3a1919de2d83c) |
-| **LiquidationEngine** | `0xEE17eAF240c6b7C566E7431088FfC99551472669` | [↗](https://sepolia.etherscan.io/address/0xEE17eAF240c6b7C566E7431088FfC99551472669) |
-| **PriceOracle** | `0x4Ca4A6fa3763b1AE2F3a09B17189152a608920f5` | [↗](https://sepolia.etherscan.io/address/0x4Ca4A6fa3763b1AE2F3a09B17189152a608920f5) |
-
-### Account Abstraction (ERC-4337)
-
-| Contract | Address | Etherscan |
-|:---|:---|:---|
-| **SmartAccount (Impl)** | `0x1e821F5796bc833FE020c05007f84dF040878d81` | [↗](https://sepolia.etherscan.io/address/0x1e821F5796bc833FE020c05007f84dF040878d81) |
-| **AccountFactory** | `0xb6445BF0F856FDF2Fd261A5c32409d226D134221` | [↗](https://sepolia.etherscan.io/address/0xb6445BF0F856FDF2Fd261A5c32409d226D134221) |
-| **NexusPaymaster** | `0x20e302881494F79eF5E536d5533be04F913eE652` | [↗](https://sepolia.etherscan.io/address/0x20e302881494F79eF5E536d5533be04F913eE652) |
-| **EntryPoint (Standard)** | `0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789` | [↗](https://sepolia.etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789) |
-
-### Cross-Chain (Chainlink CCIP)
-
-| Contract | Address | Etherscan |
-|:---|:---|:---|
-| **CrossChainRouter** | `0xE9b7f8F6c78054fb8d0D97585F32e7e026F5dd24` | [↗](https://sepolia.etherscan.io/address/0xE9b7f8F6c78054fb8d0D97585F32e7e026F5dd24) |
-| **MessageReceiver** | `0x5A371254b7e69d83C3aA4823D0e6ec4de91e95ec` | [↗](https://sepolia.etherscan.io/address/0x5A371254b7e69d83C3aA4823D0e6ec4de91e95ec) |
-| **CCIP Router (Sepolia)** | `0x0BF3dE8c5D3e8A2B34D2BEeB17ABfCeBaf363A59` | [↗](https://sepolia.etherscan.io/address/0x0BF3dE8c5D3e8A2B34D2BEeB17ABfCeBaf363A59) |
-| **Sepolia Chain Selector** | `16015286601757825753` | CCIP config |
+| Contract | Address |
+|:---|:---|
+| **PositionManager** | `0xd16150d0B2a04ECb1Aa09f840556347D5251fB53` |
+| **PerpsVault** | `0x9495fE47049a7aFe8180E9e8Aee743D533c67173` |
+| **LiquidationEngine** | `0x01721d6502547faFD3049BE60b1485B12407f58B` |
+| **PriceOracle** | `0x7C002F51B8D4F06275D43cFD1F15EcbFE7A52803` |
+| **PriceKeeper** | `0x481EC593F7bD9aB4219a0d0A185C16F2687871C2` |
 
 ### Oracle Feeds & Assets
 
 | Asset | Address | Notes |
 |:---|:---|:---|
-| **ETH/USD Feed** | `0x694AA1769357215DE4FAC081bf1f309aDC325306` | Chainlink Sepolia |
-| **BTC/USD Feed** | `0x1b44F3514812d835EB1BDB0acB33d3fA3351Ee43` | Chainlink Sepolia |
-| **USDC (Collateral)** | `0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238` | Circle Testnet USDC |
-| **WETH** | `0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14` | Sepolia Testnet |
-| **WBTC** | `0x29f2D40B0605204364af54EC677bD022dA425d03` | Sepolia Testnet |
+| **MockUSDC** | `0xDFdb18430C5C5C1EB4F9Abd69a78952f9BC3Afab` | 6-decimal collateral |
+| **MockWETH** | `0xE3579516aeB339A4a8624beadaE256619E77F61E` | Test asset |
+| **MockWBTC** | `0x20e9D3Ef17753EC0a0349eA7e26c8B8fd2B1A119` | Test asset |
+| **ETH Feed** | `0xCbE91D0b302d4eD146eE0CFfbe0d23E93e655d94` | MockAggregatorV3 |
+| **BTC Feed** | `0xf3878A726cF855EDF11C8aCbA38bEBd817fa9F23` | MockAggregatorV3 |
+
+### Cross-Chain (CCIP)
+
+| Contract | Address |
+|:---|:---|
+| **CrossChainRouter** | `0x8768d7470681a81caeA781285c9478dFDD7312e9` |
+| **MessageReceiver** | `0xdcd169ca4Ab081C1B926Dc56430ADa8fE1E10A64` |
 
 ---
 
@@ -159,54 +154,52 @@ All contracts deployed on **Ethereum Sepolia** and verified on Etherscan.
 
 ### Repository Structure
 
-```
-nexus-perps/
+```text
+nexus-polka-perps/
 ├── src/
 │   ├── core/
-│   │   ├── PositionManager.sol       # Trading engine: market/limit/liquidate/cross-chain
-│   │   ├── PerpsVault.sol            # Collateral & LP vault (18-dec precision)
-│   │   └── LiquidationEngine.sol     # Keeper-compatible batch liquidator
+│   │   ├── PositionManager.sol        # Trading engine: market/limit/liquidate/cross-chain
+│   │   ├── PerpsVault.sol             # Collateral & LP vault (18-dec precision)
+│   │   └── LiquidationEngine.sol      # Keeper-compatible batch liquidator
 │   ├── math/
-│   │   └── PnLCalculator.sol         # Pure library: PnL, liquidation health, overflow guards
+│   │   └── PnLCalculator.sol          # Pure library: PnL, liquidation health, overflow guards
 │   ├── oracles/
-│   │   └── PriceOracle.sol           # Chainlink aggregator + heartbeat staleness
-│   ├── account-abstraction/
-│   │   ├── SmartAccount.sol          # ERC-4337: EIP-712 signing, nonce, batch execution
-│   │   ├── AccountFactory.sol        # CREATE2 deterministic EIP-1167 clone factory
-│   │   └── NexusPaymaster.sol        # Verifying paymaster, chain-ID bound, packed storage
+│   │   └── PriceOracle.sol            # MockAggregatorV3 wrapper + heartbeat staleness
+│   ├── mocks/
+│   │   ├── MockAggregatorV3.sol       # Chainlink-compatible mock feed
+│   │   ├── PriceKeeper.sol            # Permissioned price updater (60s cooldown)
+│   │   ├── MockUSDC.sol
+│   │   ├── MockWBTC.sol
+│   │   └── MockWETH.sol
 │   ├── cross-chain/
-│   │   ├── CrossChainRouter.sol      # CCIP message sender + fee estimation
-│   │   └── MessageReceiver.sol       # CCIP receiver + nonce dedup + try/catch execution
+│   │   ├── CrossChainRouter.sol       # CCIP message sender + fee estimation
+│   │   └── MessageReceiver.sol        # CCIP receiver + nonce dedup + try/catch execution
+│   ├── account-abstraction/
+│   │   ├── SmartAccount.sol           # ERC-4337: EIP-712 signing, nonce, batch execution
+│   │   ├── AccountFactory.sol         # CREATE2 deterministic EIP-1167 clone factory
+│   │   └── NexusPaymaster.sol         # Verifying paymaster, chain-ID bound
 │   ├── interfaces/
-│   │   ├── IPerpsCore.sol            # Position struct, MarginMode enum, events
+│   │   ├── IPerpsCore.sol
 │   │   ├── IPriceOracle.sol
 │   │   ├── ICrossChain.sol
 │   │   └── IEntryPoint.sol
 │   └── errors/
-│       └── PerpsErrors.sol           # Centralized custom error library (29 errors)
+│       └── PerpsErrors.sol            # Centralized custom error library
 └── web3-app/
     └── src/
-        ├── app/                      # Next.js 14 App Router
-        │   ├── page.tsx              # Landing page (Server Component)
-        │   ├── trade/page.tsx        # Trading interface
-        │   ├── vaults/page.tsx       # LP vault interface
-        │   ├── portfolio/page.tsx    # Position dashboard
-        │   ├── docs/page.tsx         # Protocol docs
-        │   └── api/sign/route.ts     # AA session signing endpoint
-        ├── components/
-        │   ├── AccountVerification.tsx  # Smart account login flow ('use client')
-        │   ├── TradingViewWidget.tsx
-        │   ├── layout/Navbar.tsx
-        │   └── providers/Web3Provider.tsx
+        ├── app/
+        │   ├── trade/page.tsx         # Trading interface (Binance WS + lightweight-charts)
+        │   ├── vaults/page.tsx        # LP vault interface
+        │   ├── portfolio/page.tsx     # Position dashboard
+        │   └── docs/page.tsx          # Protocol documentation
         ├── hooks/
-        │   ├── useNexusAccount.ts    # AA session state machine
-        │   ├── useVaultOperations.ts # deposit/withdraw/addLiquidity/removeLiquidity
-        │   ├── useLPOperations.ts    # LP share tracking
-        │   ├── useVaultStats.ts      # totalLiquidity, totalLocked, APY
-        │   └── usePortfolioData.ts   # Per-trader positions + collateral
+        │   ├── useVaultOperations.ts
+        │   ├── useLPOperations.ts
+        │   ├── useVaultStats.ts
+        │   └── usePortfolioData.ts
         └── constants/
-            ├── contracts.ts          # All deployed addresses
-            └── abis/                 # 100+ auto-generated ABI JSON files
+            ├── contracts.ts           # All deployed addresses + ABIs
+            └── abis/                  # Auto-generated ABI JSON files
 ```
 
 ---
@@ -217,112 +210,68 @@ nexus-perps/
 
 Full position lifecycle: open → update → close → liquidate.
 
-- **Market Orders** — `openPosition()` validates oracle price, locks collateral in vault, stores position at current Chainlink price
-- **Limit Orders** — `placeLimitOrder()` locks collateral optimistically. Keeper calls `executeLimitOrder()` when price condition met, earns `keeperRewardBps` deducted from collateral
-- **Cross-Chain Trades** — `executeCrossChainTrade()` gated by `onlyCrossChainReceiver`. Positions flagged `isCrossChain = true` bypass local vault settlement on close
-- **Liquidations** — Isolated mode uses `PnLCalculator.isLiquidatable()`. Cross-margin computes `totalEquity = vaultCollateral + globalPnL` across all active positions via `_calculateGlobalPnL`
-- **Asset Tracking** — Swap-and-pop O(1) removal. Capped at `maxActiveAssets` per trader
+- **Market Orders** — `openPosition()` validates oracle price, locks collateral in vault, stores position at current mock Chainlink price
+- **Limit Orders** — `placeLimitOrder()` locks collateral optimistically. Keeper calls `executeLimitOrder()` when price condition met
+- **Cross-Chain Trades** — `executeCrossChainTrade()` gated by `onlyCrossChainReceiver`
+- **Liquidations** — Isolated mode uses `PnLCalculator.isLiquidatable()`. Cross-margin computes `totalEquity = vaultCollateral + globalPnL`
 
 #### `PerpsVault.sol` — Collateral & Liquidity
 
-Single contract holding all trader collateral and LP liquidity with strict dual accounting.
+Single contract holding all trader collateral and LP liquidity.
 
-- **Dual accounting** — `traderCollateral` (free) and `lockedCollateral` (in positions) tracked separately. `totalTraderFreeCollateral` global invariant maintained on every state change
-- **LP Shares** — First deposit burns `MINIMUM_LIQUIDITY = 1000` permanently preventing inflation attacks. Subsequent deposits: `sharesToMint = scaledAmount * totalLpShares / totalLiquidity`
-- **`settleTrade()`** — Atomically unlocks collateral → adjusts `totalLiquidity` for PnL → credits payout to trader. Physical token balance checked as safety floor before payout
+- **Dual accounting** — `traderCollateral` (free) and `lockedCollateral` (in positions) tracked separately
+- **LP Shares** — First deposit burns `MINIMUM_LIQUIDITY = 1000` permanently preventing inflation attacks
+- **`settleTrade()`** — Atomically unlocks collateral → adjusts `totalLiquidity` for PnL → credits payout to trader
 - **Dust prevention** — `withdraw()` enforces `scaledAmount % DECIMALS_SCALAR == 0`
 
 #### `PnLCalculator.sol` — Math Library
 
-Pure Solidity library, zero state, no imports except interfaces.
+Pure Solidity library, zero state.
 
-```
+```text
 positionSize   = (collateral × leverage) / 1e18
 PnL            = (priceDelta × positionSize) / entryPrice
 isLiquidatable = equity ≤ maintenanceMargin
                = (collateral + PnL) ≤ (collateral × liquidationThresholdBps / 10000)
 ```
 
-Overflow guard inside `unchecked {}`: checks `priceDelta * size <= type(uint256).max` before multiplication. Reverts with `PerpsErrors.InvalidAmount()` on overflow.
-
-#### `SmartAccount.sol` — ERC-4337 Wallet
-
-EIP-1167 clone-compatible, EIP-712 structured signing.
-
-- `validateUserOp()` — verifies nonce, recovers signer from `USER_OP_TYPEHASH` struct hash via `ECDSA.tryRecover`. Pays `missingAccountFunds` to EntryPoint. Returns `0` (success) or `1` (failure)
-- `execute()` / `executeBatch()` — callable only by EntryPoint. Batch validates array length parity. Uses inline `assembly { revert(add(result, 32), mload(result)) }` to bubble downstream errors
-- `_disableInitializers()` in constructor prevents the implementation contract itself from being initialized as an attack vector
-
-#### `NexusPaymaster.sol` — Gas Sponsor
-
-Packed storage: `verifyingSigner` (20 bytes) + `maxCostLimit` (12 bytes) fits in 1 storage slot.
-
-- `paymasterAndData` must be exactly `85 bytes` (20 addr + 65 sig) — any other length rejected
-- Signs `keccak256(userOpHash, block.chainid, address(this))` — chain + contract binding prevents cross-chain replay
-
-#### `CrossChainRouter.sol` — CCIP Sender
-
-- Encodes `(trader, nonce, token, isLong, margin, leverage)` as ABI payload, sent via `CCIP_ROUTER.ccipSend`
-- Refunds surplus ETH via `call{value: refundAmount, gas: 3000}` — intentionally ignores return (no reentrancy vector, documented in code)
-- `rescueFunds()` differentiates ETH rescue (`address(this).balance - operationalBalance`) from ERC20 rescue to prevent double-counting
-
-#### `MessageReceiver.sol` — CCIP Receiver
-
-- Source chain whitelist + sender address whitelist — double-gated access control
-- Per-trader nonce deduplication: `processedNonces[trader][nonce]` prevents replay before execution
-- `try/catch` wraps `positionManager.executeCrossChainTrade()` — failed trades emit `TradeFailed` but **never** block the CCIP pipeline
-
 ---
 
 ## 💻 Frontend Stack
 
-**Next.js 14 App Router** with zero backend dependency for read operations. All contract reads use Wagmi v2 + Viem directly from the browser.
-
-### Technology
+**Next.js 15 App Router** with zero backend dependency for read operations.
 
 | Layer | Technology |
 |:---|:---|
-| Framework | Next.js 14 (TypeScript, App Router) |
+| Framework | Next.js 15 (TypeScript, App Router) |
 | Blockchain | Wagmi v2 + Viem |
-| Wallet UI | RainbowKit (MetaMask, WalletConnect, Coinbase Wallet) |
+| Wallet UI | RainbowKit (MetaMask, Bitget, OKX) |
 | Queries | TanStack Query v5 |
-| Styling | Tailwind CSS |
-| Fonts | Syne (display) · Space Mono (mono) |
-| RPC | Alchemy primary → PublicNode → Sepolia.org → Infura public (fallback chain) |
+| Charts | lightweight-charts (Binance REST API klines) |
+| Live Prices | Binance WebSocket (`wss://stream.binance.com`) |
+| Styling | Tailwind CSS + Framer Motion |
+| Network | Polkadot Hub Testnet (Chain ID: 420420417) |
 
-### Smart Account Login Flow
+### Key Frontend Features
 
-`AccountVerification.tsx` (`'use client'`) drives a 5-step state machine via `useNexusAccount`:
-
-```
-idle
- └─▶ fetching_nonce       GET /api/sign/route.ts → server generates EIP-712 nonce
-       └─▶ awaiting_signature   wallet.signTypedData()
-             └─▶ verifying      POST /api/sign → server verifies signature + issues JWT
-                   └─▶ deploying_account  AccountFactory.createAccount() if new wallet
-                         └─▶ done    24h session active · gas sponsored by NexusPaymaster
-```
-
-Each step renders its own UI: spinner, progress bar, error retry. `page.tsx` (Server Component) simply imports `<AccountVerification />` — no `'use client'` needed on the page, no server/client boundary error.
+- **Live PnL** — Binance WebSocket prices drive real-time P&L display independent of on-chain oracle
+- **Entry Price** — Saved locally at trade execution time, survives page refresh
+- **Position Polling** — 2s refetch interval, aggressive retry after open/close
+- **Lightweight Charts** — Fast candlestick chart via Binance REST API klines
 
 ---
 
-### Testing Methodology
+## 🧪 Test Suite & Coverage
 
-**Unit Tests** — Every function in isolation. Success paths, revert conditions, access control, edge cases (zero amounts, stale prices, unauthorized callers, zero addresses).
-
-**Integration Tests:**
-- `AAFlowIntegrationTest` — Smart account deploy → UserOp validation → batch trade execution → unauthorized block
-- `CrossChainIntegrationFlowTest` — Full CCIP encode → router send → receiver decode → PositionManager execute → invalid asset revert → direct call block
-- `LiquidationFlowIntegrationTest` — Stale price oracle protection, precise math solvency, mixed-state batch resilience
-
-**Fuzz Tests (256 runs each):**
-- `testFuzz_OpenRandomPositions` — random collateral + leverage, validates no panic or unexpected revert
-- `testFuzz_LiquidationMathSolvency` — validates vault never insolvent under any liquidation scenario
+```bash
+forge test        # 95 tests, ~3s
+forge coverage    # coverage report
+forge test -vvv   # verbose with traces
+```
 
 **Invariant Tests (128 runs × 50 calls = 6,400 state mutations, 0 reverts):**
 
-```
+```text
 ╭─────────────────────┬────────────────────┬───────┬─────────┬──────────╮
 │ Contract            │ Selector           │ Calls │ Reverts │ Discards │
 ╞═════════════════════╪════════════════════╪═══════╪═════════╪══════════╡
@@ -333,9 +282,9 @@ Each step renders its own UI: spinner, progress bar, error retry. `page.tsx` (Se
 ╰─────────────────────┴────────────────────┴───────┴─────────┴──────────╯
 ```
 
-- `invariant_VaultIsSolvent` — `totalLiquidity ≥ 0` holds across all state mutations
-- `invariant_InternalAccountingConsistent` — sum of all internal balances matches physical `ASSET.balanceOf(vault)`
-- `invariant_MaxActiveAssetsRespected` — no trader ever exceeds `maxActiveAssets`
+- `invariant_VaultIsSolvent` — `totalLiquidity ≥ 0` holds across all mutations
+- `invariant_InternalAccountingConsistent` — internal balances match `ASSET.balanceOf(vault)`
+- `invariant_MaxActiveAssetsRespected` — no trader exceeds `maxActiveAssets`
 
 ---
 
@@ -345,48 +294,55 @@ Each step renders its own UI: spinner, progress bar, error retry. `page.tsx` (Se
 
 - [Foundry](https://book.getfoundry.sh/getting-started/installation) (forge, cast, anvil)
 - Node.js ≥ 18
-- Alchemy API key for Sepolia RPC
 
 ### Smart Contracts
 
 ```bash
-git clone https://github.com/NexTechArchitect/Nexus-Protocol.git
-cd Nexus-Protocol
+git clone https://github.com/NexTechArchitect/nexus-polka-perps.git
+cd nexus-polka-perps
 
 # Install Foundry dependencies
 forge install
 
-# Run full test suite (95 tests, ~3s)
+# Run full test suite (95 tests)
 forge test -vv
 
-# Generate coverage report
-forge coverage
-
-# Deploy to Sepolia
+# Deploy to Polkadot Hub Testnet
 cp .env.example .env
-# Fill: PRIVATE_KEY, RPC_URL, ETHERSCAN_API_KEY
-forge script script/deploy/05_FullDeploy.s.sol --rpc-url sepolia --broadcast --verify
+# Fill: PRIVATE_KEY
+
+forge script script/deploy/01_DeployMocks.s.sol  --rpc-url polkadot-testnet --broadcast --legacy
+forge script script/deploy/02_DeployOracle.s.sol --rpc-url polkadot-testnet --broadcast --legacy
+forge script script/deploy/03_DeployVault.s.sol  --rpc-url polkadot-testnet --broadcast --legacy
+forge script script/deploy/04_DeployCore.s.sol   --rpc-url polkadot-testnet --broadcast --legacy
+forge script script/deploy/05_DeployCCIP.s.sol   --rpc-url polkadot-testnet --broadcast --legacy
 ```
 
 ### Frontend
 
 ```bash
 cd web3-app
-npm install
-
-cp .env.local.example .env.local
-# NEXT_PUBLIC_ALCHEMY_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY
-
+npm install --legacy-peer-deps
 npm run dev
 # → http://localhost:3000
 ```
 
-### Get Testnet USDC
+### Network Config (`foundry.toml`)
 
-1. Go to **[faucet.circle.com](https://faucet.circle.com/)**
-2. Select **Ethereum Sepolia** (not mainnet)
-3. Enter wallet address → receive USDC
-4. Deposit via **Vaults** page → start trading
+```toml
+[rpc_endpoints]
+polkadot-testnet = "https://services.polkadothub-rpc.com/testnet"
+
+[etherscan]
+polkadot-testnet = { key = "no-key", url = "https://blockscout-passet-hub.parity-testnet.parity.io/api" }
+```
+
+### Get Testnet Tokens
+
+| Token | Faucet |
+|:---|:---|
+| **PAS** (gas) | [faucet.polkadot.io](https://faucet.polkadot.io/) |
+| **USDC** (collateral) | Mint via `MockUSDC.mint()` or ask deployer |
 
 ---
 
@@ -394,35 +350,35 @@ npm run dev
 
 | Attack Vector | Mitigation |
 |:---|:---|
-| Oracle price manipulation | Chainlink `latestRoundData()` + `block.timestamp - updatedAt > heartbeat` staleness revert |
-| Reentrancy | `ReentrancyGuard` on all vault state-changing functions: `settleTrade`, `transferByManager`, `batchLiquidate` |
+| Oracle price manipulation | MockAggregatorV3 + `block.timestamp - updatedAt > heartbeat` staleness revert |
+| Reentrancy | `ReentrancyGuard` on all vault state-changing functions |
 | LP share inflation attack | `MINIMUM_LIQUIDITY = 1000` permanently burned on genesis deposit |
 | Dust sweep / precision drain | `scaledAmount % DECIMALS_SCALAR != 0` reverts on withdrawal |
-| Cross-chain replay | Per-trader nonce map in `MessageReceiver` + `block.chainid` binding in `NexusPaymaster` |
-| Unauthorized cross-chain calls | `onlyCrossChainReceiver` + source chain whitelist + sender whitelist (3 layers) |
+| Cross-chain replay | Per-trader nonce map in `MessageReceiver` |
+| Unauthorized cross-chain calls | `onlyCrossChainReceiver` + source chain whitelist + sender whitelist |
 | Over-withdrawal during active position | `lockedCollateral` tracking prevents withdrawing margin from open positions |
-| Paymaster signature forgery | `keccak256(userOpHash, block.chainid, address(this))` — chain + contract bound |
-| CCIP pipeline blocking | `try/catch` in `_ccipReceive` — failed trades emit `TradeFailed`, never block the pipeline |
-| Keeper reward rug pull | `rescueTokens()` explicitly blocks `PROTOCOL_ASSET` from owner withdrawal |
-| Implementation contract initialization | `_disableInitializers()` in `SmartAccount` constructor |
+| Keeper reward rug pull | `rescueTokens()` blocks `PROTOCOL_ASSET` from owner withdrawal |
+| CCIP pipeline blocking | `try/catch` in `_ccipReceive` — failed trades emit `TradeFailed`, never block pipeline |
 
-> ⚠️ **No formal external security audit has been conducted.** Deployed on Sepolia testnet with testnet assets only. Do not use with real funds.
+> ⚠️ **No formal external security audit has been conducted.** Deployed on Polkadot Hub testnet with testnet assets only. Do not use with real funds.
 
 ---
 
 ## ⚠️ Testnet Disclaimer
 
-Nexus Perps runs exclusively on **Ethereum Sepolia**. All USDC is Circle testnet USDC with zero real-world value. Faucet at [faucet.circle.com](https://faucet.circle.com/) — select **Ethereum Sepolia** only. This is not financial advice.
+Nexus Perps runs exclusively on **Polkadot Hub Testnet** (Chain ID: 420420417). All assets are testnet tokens with zero real-world value. Get PAS gas tokens from [faucet.polkadot.io](https://faucet.polkadot.io/). This is not financial advice.
 
----
+<br>
 
 <div align="center">
+  <b>Built with ⚡ by <a href="https://github.com/NexTechArchitect">NexTech Architect</a></b><br><br>
 
-**Built with ⚡ by [NexTech Architect](https://github.com/NexTechArchitect)**
+  <a href="https://x.com/itZ_AmiT0">
+    <img src="https://img.shields.io/badge/𝕏-@itZ__AmiT0-000000?style=flat-square&logo=x" alt="Twitter"/>
+  </a>
+  <a href="https://github.com/NexTechArchitect">
+    <img src="https://img.shields.io/badge/GitHub-NexTechArchitect-181717?style=flat-square&logo=github" alt="GitHub"/>
+  </a><br><br>
 
-[![Twitter](https://img.shields.io/badge/𝕏-@itZ__AmiT0-000000?style=flat-square&logo=x)](https://x.com/itZ_AmiT0)
-[![GitHub](https://img.shields.io/badge/GitHub-NexTechArchitect-181717?style=flat-square&logo=github)](https://github.com/NexTechArchitect)
-
-*Senior Smart Contract Developer · Solidity · Foundry · Full Stack Web3*
-
+  <i>Built for the Polkadot Solidity Hackathon 2026</i>
 </div>
