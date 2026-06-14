@@ -360,7 +360,6 @@ polkadot-testnet = { key = "no-key", url = "https://blockscout-passet-hub.parity
 | Keeper reward rug pull | `rescueTokens()` blocks `PROTOCOL_ASSET` from owner withdrawal |
 | CCIP pipeline blocking | `try/catch` in `_ccipReceive` — failed trades emit `TradeFailed`, never block pipeline |
 
-> ⚠️ **No formal external security audit has been conducted.** Deployed on Polkadot Hub testnet with testnet assets only. Do not use with real funds.
 
 ---
 
