@@ -183,7 +183,7 @@ nexus-polka-perps/
    │   ├── IPriceOracle.sol
    │   ├── ICrossChain.sol
    │   └── IEntryPoint.sol
-    └── errors/
+   |└── errors/
         └── PerpsErrors.sol            # Centralized custom error library
 
 ```
