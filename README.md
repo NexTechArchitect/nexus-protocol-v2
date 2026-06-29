@@ -157,49 +157,35 @@ All contracts deployed on **Polkadot Hub Testnet** (Chain ID: `420420417`).
 ```text
 nexus-polka-perps/
 ├── src/
-│   ├── core/
-│   │   ├── PositionManager.sol        # Trading engine: market/limit/liquidate/cross-chain
-│   │   ├── PerpsVault.sol             # Collateral & LP vault (18-dec precision)
-│   │   └── LiquidationEngine.sol      # Keeper-compatible batch liquidator
-│   ├── math/
-│   │   └── PnLCalculator.sol          # Pure library: PnL, liquidation health, overflow guards
-│   ├── oracles/
-│   │   └── PriceOracle.sol            # MockAggregatorV3 wrapper + heartbeat staleness
-│   ├── mocks/
-│   │   ├── MockAggregatorV3.sol       # Chainlink-compatible mock feed
-│   │   ├── PriceKeeper.sol            # Permissioned price updater (60s cooldown)
-│   │   ├── MockUSDC.sol
-│   │   ├── MockWBTC.sol
-│   │   └── MockWETH.sol
-│   ├── cross-chain/
-│   │   ├── CrossChainRouter.sol       # CCIP message sender + fee estimation
-│   │   └── MessageReceiver.sol        # CCIP receiver + nonce dedup + try/catch execution
-│   ├── account-abstraction/
-│   │   ├── SmartAccount.sol           # ERC-4337: EIP-712 signing, nonce, batch execution
-│   │   ├── AccountFactory.sol         # CREATE2 deterministic EIP-1167 clone factory
-│   │   └── NexusPaymaster.sol         # Verifying paymaster, chain-ID bound
-│   ├── interfaces/
-│   │   ├── IPerpsCore.sol
-│   │   ├── IPriceOracle.sol
-│   │   ├── ICrossChain.sol
-│   │   └── IEntryPoint.sol
-│   └── errors/
-│       └── PerpsErrors.sol            # Centralized custom error library
-└── web3-app/
-    └── src/
-        ├── app/
-        │   ├── trade/page.tsx         # Trading interface (Binance WS + lightweight-charts)
-        │   ├── vaults/page.tsx        # LP vault interface
-        │   ├── portfolio/page.tsx     # Position dashboard
-        │   └── docs/page.tsx          # Protocol documentation
-        ├── hooks/
-        │   ├── useVaultOperations.ts
-        │   ├── useLPOperations.ts
-        │   ├── useVaultStats.ts
-        │   └── usePortfolioData.ts
-        └── constants/
-            ├── contracts.ts           # All deployed addresses + ABIs
-            └── abis/                  # Auto-generated ABI JSON files
+   ├── core/
+   │   ├── PositionManager.sol        # Trading engine: market/limit/liquidate/cross-chain
+   │   ├── PerpsVault.sol             # Collateral & LP vault (18-dec precision)
+   │   └── LiquidationEngine.sol      # Keeper-compatible batch liquidator
+   ├── math/
+   │   └── PnLCalculator.sol          # Pure library: PnL, liquidation health, overflow guards
+   ├── oracles/
+   │   └── PriceOracle.sol            # MockAggregatorV3 wrapper + heartbeat staleness
+   ├── mocks/
+   │   ├── MockAggregatorV3.sol       # Chainlink-compatible mock feed
+   │   ├── PriceKeeper.sol            # Permissioned price updater (60s cooldown)
+   │   ├── MockUSDC.sol
+   │   ├── MockWBTC.sol
+   │   └── MockWETH.sol
+   ├── cross-chain/
+   │   ├── CrossChainRouter.sol       # CCIP message sender + fee estimation
+   │   └── MessageReceiver.sol        # CCIP receiver + nonce dedup + try/catch execution
+   ├── account-abstraction/
+   │   ├── SmartAccount.sol           # ERC-4337: EIP-712 signing, nonce, batch execution
+   │   ├── AccountFactory.sol         # CREATE2 deterministic EIP-1167 clone factory
+   │   └── NexusPaymaster.sol         # Verifying paymaster, chain-ID bound
+   ├── interfaces/
+   │   ├── IPerpsCore.sol
+   │   ├── IPriceOracle.sol
+   │   ├── ICrossChain.sol
+   │   └── IEntryPoint.sol
+    └── errors/
+        └── PerpsErrors.sol            # Centralized custom error library
+
 ```
 
 ---
